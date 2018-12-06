@@ -2,6 +2,16 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.1.
 
+## angular.json
+[Angular CLI Workspace File](https://github.com/angular/angular-cli/wiki/angular-workspace)
+```
+"prefix": "erln"
+"styles": [
+    "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+    "src/styles.scss"
+]
+```
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
