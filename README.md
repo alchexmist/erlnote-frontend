@@ -1,6 +1,9 @@
 # ErlnoteFrontend
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.1.
+```
+ng new erlnote-frontend --style=scss --routing --prefix=erln
+```
 
 ## angular.json
 [Angular CLI Workspace File](https://github.com/angular/angular-cli/wiki/angular-workspace)
