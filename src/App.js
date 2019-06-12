@@ -1,8 +1,10 @@
 import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
 import logo from './logo.svg';
 import './App.css';
 
-function App() {
+function Example() {
   return (
     <div className="App">
       <header className="App-header">
@@ -20,6 +22,28 @@ function App() {
         </a>
       </header>
     </div>
+  );
+}
+
+const Page404 = ({location, info}) => (
+    <div className="App">
+      <header className="App-header">
+        <h2>No match found for <code>{location.hash}</code></h2>
+        <p>{info}</p>
+      </header>
+    </div>
+);
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/example" component={Example} />
+
+        {/* when none of the above match, <BadRoute> will be rendered */}
+        <Route render={props => <Page404 {...props} info="INSERT COIN..." />} />
+      </Switch>
+    </BrowserRouter>
   );
 }
 
