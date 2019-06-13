@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import {Alert} from 'react-bootstrap';
 
 import logo from './logo.svg';
 import './App.css';
@@ -26,12 +27,20 @@ function Example() {
 }
 
 const Page404 = ({location, info}) => (
-    <div className="App">
-      <header className="App-header">
-        <h2>No match found for <code>{location.hash}</code></h2>
+  <div className="App">
+    <header className="App-header">
+      <Alert variant='dark'>
+        <h2>No match found for <code>{location.pathname}</code></h2>
         <p>{info}</p>
-      </header>
-    </div>
+      </Alert>
+    </header>
+  </div>
+    // <div className="App">
+    //   <header className="App-header">
+    //     <h2>No match found for <code>{location.pathname}</code></h2>
+    //     <p>{info}</p>
+    //   </header>
+    // </div>
 );
 
 function App() {
