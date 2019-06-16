@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import {Alert} from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 
 import logo from './logo.svg';
 import './App.css';
+import Login from './Login';
 
 function Example() {
   return (
@@ -30,17 +31,12 @@ const Page404 = ({location, info}) => (
   <div className="App">
     <header className="App-header">
       <Alert variant='dark'>
-        <h2>No match found for <code>{location.pathname}</code></h2>
+        <Alert.Heading>No match found for <code>{location.pathname}</code></Alert.Heading>
+        <hr />
         <p>{info}</p>
       </Alert>
     </header>
   </div>
-    // <div className="App">
-    //   <header className="App-header">
-    //     <h2>No match found for <code>{location.pathname}</code></h2>
-    //     <p>{info}</p>
-    //   </header>
-    // </div>
 );
 
 function App() {
@@ -48,7 +44,7 @@ function App() {
     <BrowserRouter>
       <Switch>
         <Route exact path="/example" component={Example} />
-
+        <Route exact path="/login" component={Login} />
         {/* when none of the above match, <BadRoute> will be rendered */}
         <Route render={props => <Page404 {...props} info="INSERT COIN..." />} />
       </Switch>
