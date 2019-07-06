@@ -3,10 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@absinthe/socket-apollo-link": "^0.2.1",
+    "apollo-cache-inmemory": "^1.6.2",
+    "apollo-client": "^2.6.3",
+    "apollo-link": "^1.2.12",
+    "apollo-link-context": "^1.0.18",
+    "apollo-link-http": "^1.5.15",
     "bootstrap": "^4.3.1",
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.13.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-react": "^7.14.2",
+    "eslint-plugin-standard": "^4.0.0",
+    "graphql": "^14.3.1",
+    "graphql-tag": "^2.10.1",
     "jquery": "^3.4.1",
+    "phoenix": "^1.4.8",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
+    "react-apollo": "^2.5.6",
     "react-bootstrap": "^1.0.0-beta.9",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
@@ -35,5 +53,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "flatted": "^2.0.1",
+    "redux-devtools": "^3.5.0"
   }
 }
