@@ -1,53 +1,51 @@
+/* eslint-disable max-len */
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { Alert } from 'react-bootstrap';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {Alert} from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
-import logo from './logo.svg';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 import './App.css';
 import Login from './Login';
+import AppHeader from './components/AppHeader';
+import AppFooter from './components/AppFooter';
 
-function Example() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
+// eslint-disable-next-line no-unused-vars
 const Page404 = ({location, info}) => (
-  <div className="App">
-    <header className="App-header">
-      <Alert variant='dark'>
-        <Alert.Heading>No match found for <code>{location.pathname}</code></Alert.Heading>
-        <hr />
-        <p>{info}</p>
-      </Alert>
-    </header>
-  </div>
+  <Container className="d-flex flex-column justify-content-center App-header h-100" fluid="true">
+    <Row>
+      <Col className="d-flex flex-row justify-content-center">
+        <Alert variant='dark'>
+          <Alert.Heading>No match found for <code>{location.pathname}</code></Alert.Heading>
+          <hr />
+          <p>{info}</p>
+        </Alert>
+      </Col>
+    </Row>
+  </Container>
 );
 
+Page404.propTypes = {
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
+  }).isRequired,
+  info: PropTypes.string.isRequired,
+};
+
+// eslint-disable-next-line require-jsdoc
 function App() {
   return (
     <BrowserRouter>
+      <AppHeader />
       <Switch>
-        <Route exact path="/example" component={Example} />
         <Route exact path="/login" component={Login} />
         {/* when none of the above match, <BadRoute> will be rendered */}
-        <Route render={props => <Page404 {...props} info="INSERT COIN..." />} />
+        <Route render={(props) => <Page404 {...props} info="INSERT COIN..." />} />
       </Switch>
+      <AppFooter />
     </BrowserRouter>
   );
 }
