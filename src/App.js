@@ -10,6 +10,7 @@ import Col from 'react-bootstrap/Col';
 
 import './App.css';
 import Login from './Login';
+import RunLogin from './containers/RunLogin';
 import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
 
@@ -41,7 +42,8 @@ function App() {
     <BrowserRouter>
       <AppHeader />
       <Switch>
-        <Route exact path="/login" component={Login} />
+        {/* <Route exact path="/login" component={Login} /> */}
+        <Route exact path="/login" component={RunLogin} />
         {/* when none of the above match, <BadRoute> will be rendered */}
         <Route render={(props) => <Page404 {...props} info="INSERT COIN..." />} />
       </Switch>

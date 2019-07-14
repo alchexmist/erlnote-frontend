@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {Nav, Navbar} from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import {LinkContainer} from 'react-router-bootstrap';
 
 class AppFooter extends Component {
   render() {
@@ -10,9 +11,11 @@ class AppFooter extends Component {
       <Container fluid="true">
         <Row className="flex-column">
           <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">
-              {' React Bootstrap'}
-            </Navbar.Brand>
+            <LinkContainer to="/login">
+              <Navbar.Brand>
+                {' by @alchexmist'}
+              </Navbar.Brand>
+            </LinkContainer>
           </Navbar>
         </Row>
       </Container>

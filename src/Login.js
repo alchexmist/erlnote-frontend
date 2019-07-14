@@ -1,21 +1,39 @@
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
-import {Button, Form, Nav, Navbar} from 'react-bootstrap';
+// eslint-disable-next-line no-unused-vars
+import {Button, Form, Nav, Navbar, ButtonToolbar} from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import gql from 'graphql-tag';
 import {Mutation} from 'react-apollo';
+import {ACCESS_TOKEN_PARAM} from './graphql-client';
+
+import {Alert} from 'react-bootstrap';
 
 const LOGIN_MUTATION = gql`
     mutation Login($email: String!, $password: String!) {
       login(email: $email, password: $password) {
-        id
+        user {
+          id
+          username
+        }
         token
       }
     }`;
+
+function LoginFailed(props) {
+  const isLoggedIn = props.isLoggedIn;
+  if (isLoggedIn) {
+    return (<Alert variant="danger">
+      ¡Fallo de autenticación!
+    </Alert>
+    );
+  }
+  return null;
+}
 
 export default class Login extends Component {
   constructor(props) {
@@ -24,26 +42,8 @@ export default class Login extends Component {
     this.state = {
       email: '',
       password: '',
+      loginFailed: false,
     };
-  }
-
-  handleLoginClick(e) {
-    e.preventDefault();
-    // <Mutation mutation={LOGIN_MUTATION}>
-    //   {(runLogin, {data}) => (
-    //     runLogin({variables: {email: this.state.email, password: this.state.password}})
-    //   )}
-    // </Mutation>;
-  }
-
-  handleMailChange(e) {
-    console.log('MailChangeEvent -> ', e.target.value);
-    this.setState({email: e.target.value});
-  }
-
-  handlePasswordChange(e) {
-    console.log('PasswordChangeEvent -> ', e.target.value);
-    this.setState({password: e.target.value});
   }
 
   render() {
@@ -51,26 +51,12 @@ export default class Login extends Component {
     return (
       // <Container className="d-flex flex-column justify-content-between h-100" fluid="true">
       <Container className="d-flex flex-column justify-content-between" fluid="true">
-        {/* <Row className="d-flex flex-column">
-          <Navbar bg="dark" variant="dark" >
-            <Navbar.Brand href="#home">Navbar</Navbar.Brand>
-            <Nav className="mr-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-              <Nav.Link href="#features">Features</Nav.Link>
-              <Nav.Link href="#pricing">Pricing</Nav.Link>
-            </Nav>
-            <Form inline>
-              <Form.Control type="text" placeholder="Search" className="mr-sm-2" />
-              <Button variant="outline-info">Search</Button>
-            </Form>
-          </Navbar>
-        </Row> */}
         <Row>
           <Col className="d-flex flex-row justify-content-center">
             <Form>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label style={style.loginLabel}>Correo electrónico</Form.Label>
-                <Form.Control type="email" placeholder="Introduzca su dirección de correo" autoComplete="email" value={this.state.email} onChange={(e) => this.handleMailChange(e)} />
+                <Form.Control size="lg" type="email" placeholder="Introduzca su dirección de correo" autoComplete="email" value={this.state.email} onChange={(e) => this.setState({email: e.target.value})} />
                 <Form.Text className="text-muted">
                   Nunca compartiremos tu dirección de correo electrónico con nadie.
                 </Form.Text>
@@ -78,27 +64,46 @@ export default class Login extends Component {
 
               <Form.Group controlId="formBasicPassword" >
                 <Form.Label style={style.loginLabel}>Contraseña</Form.Label>
-                <Form.Control type="password" placeholder="Contraseña" autoComplete="current-password" value={this.state.password} onChange={(e) => this.handlePasswordChange(e)} />
+                <Form.Control size="lg" type="password" placeholder="Contraseña" autoComplete="current-password" value={this.state.password} onChange={(e) => this.setState({password: e.target.value})} />
+                <LoginFailed isLoggedIn={this.state.loginFailed} />
               </Form.Group>
-              <Button variant="dark" size="lg" type="submit" onClick={(e) => this.handleLoginClick(e)}>
-                Confirmar
+              {/* <Container className="d-flex flex-row justify-content-end" fluid="true">
+                <Row>
+                <Col  > */}
+              <Mutation
+                mutation={LOGIN_MUTATION}
+                onCompleted={({login}) => {
+                  console.log('Token: ', login.token);
+                  console.log('Username: ', login.user.username);
+                  console.log('ID: ', login.user.id);
+                  this.props.onLoginClick(login.user.id, login.user.username, login.token);
+                  localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
+                  console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
+                  // client.writeData({ data: { isLoggedIn: true } });
+                }}
+                onError={({error}) => {
+                  this.props.onLoginClick(null, null, null);
+                  console.log('Error de autenticación!');
+                  this.setState({loginFailed: true});
+                }}
+              >
+                {(loginMutation, {data}) => (
+                  <Button block variant="dark" size="lg" type="submit" onClick={(e) => {
+                    e.preventDefault();
+                    loginMutation({variables: {email: this.state.email, password: this.state.password}});
+                    this.setState({email: ''});
+                    this.setState({password: ''});
+                  }}>
+                    Entrar
+                  </Button>
+                )}
+              </Mutation>
+              <Button block variant="dark" size="lg" type="reset">
+                Restablecer
               </Button>
-              <Button variant="dark" size="lg" type="submit">
-                Reset
-              </Button>
-              {/* <Button style={{'color': 'red', 'backgroundColor': 'green'}}>
-                Reset
-              </Button> */}
             </Form>
           </Col>
         </Row>
-        {/* <Row className="d-flex flex-column">
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">
-              {' React Bootstrap'}
-            </Navbar.Brand>
-          </Navbar>
-        </Row> */}
       </Container>
     ); // End return-render
   }
