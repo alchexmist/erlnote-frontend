@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import {Alert} from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -13,6 +13,7 @@ import Login from './Login';
 import RunLogin from './containers/RunLogin';
 import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
+import { ACCESS_TOKEN_PARAM } from './graphql-client';
 
 // eslint-disable-next-line no-unused-vars
 const Page404 = ({location, info}) => (
@@ -36,6 +37,9 @@ Page404.propTypes = {
   info: PropTypes.string.isRequired,
 };
 
+const SignUp = () => <h3>SignUp</h3>
+const Protected = (props) => <h3>{props.extra}</h3>
+const Dashboard = (props) => <h3>{props.dashboard}</h3>
 // eslint-disable-next-line require-jsdoc
 function App() {
   return (
@@ -43,7 +47,11 @@ function App() {
       <AppHeader />
       <Switch>
         {/* <Route exact path="/login" component={Login} /> */}
-        <Route exact path="/login" component={RunLogin} />
+        <Route exact path="/" render={() => (localStorage.getItem(ACCESS_TOKEN_PARAM) ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
+        {/* <Route path="/" exact component={RunLogin} /> */}
+        <Route path="/dashboard" exact render={(props) => <Dashboard {...props} dashboard={'Mi dashboard'} />} />
+        <Route path="/signup" component={SignUp} />
+        <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} />
         {/* when none of the above match, <BadRoute> will be rendered */}
         <Route render={(props) => <Page404 {...props} info="INSERT COIN..." />} />
       </Switch>

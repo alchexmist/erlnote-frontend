@@ -12,6 +12,7 @@ import {Mutation} from 'react-apollo';
 import {ACCESS_TOKEN_PARAM} from './graphql-client';
 
 import {Alert} from 'react-bootstrap';
+import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 
 const LOGIN_MUTATION = gql`
     mutation Login($email: String!, $password: String!) {
@@ -43,10 +44,17 @@ export default class Login extends Component {
       email: '',
       password: '',
       loginFailed: false,
+      redirectToDashboard: false,
     };
   }
 
   render() {
+    const {redirectToDashboard} = this.state;
+
+    if (redirectToDashboard === true) {
+      return <Redirect to='/dashboard' />;
+    }
+
     const style = {loginLabel: {'color': 'white', 'backgroundColor': 'rgb(53, 58, 63)'}};
     return (
       // <Container className="d-flex flex-column justify-content-between h-100" fluid="true">
@@ -79,6 +87,7 @@ export default class Login extends Component {
                   this.props.onLoginClick(login.user.id, login.user.username, login.token);
                   localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
                   console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
+                  this.setState({redirectToDashboard: true});
                   // client.writeData({ data: { isLoggedIn: true } });
                 }}
                 onError={({error}) => {
