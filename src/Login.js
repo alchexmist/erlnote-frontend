@@ -58,7 +58,7 @@ export default class Login extends Component {
     const style = {loginLabel: {'color': 'white', 'backgroundColor': 'rgb(53, 58, 63)'}};
     return (
       // <Container className="d-flex flex-column justify-content-between h-100" fluid="true">
-      <Container className="d-flex flex-column justify-content-between" fluid="true">
+      <Container className="d-flex flex-column justify-content-between p-0" fluid="true">
         <Row>
           <Col className="d-flex flex-row justify-content-center">
             <Form>

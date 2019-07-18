@@ -8,8 +8,8 @@ import {LinkContainer} from 'react-router-bootstrap';
 class AppFooter extends Component {
   render() {
     return (
-      <Container fluid="true">
-        <Row className="flex-column">
+      <Container className="p-0" fluid="true">
+        <Row className="flex-column m-0">
           <Navbar bg="dark" variant="dark">
             <LinkContainer to="/login">
               <Navbar.Brand>
