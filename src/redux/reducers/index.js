@@ -1,4 +1,5 @@
-import {ADD_ACCOUNT} from '../constants/action-types';
+/* eslint-disable max-len */
+import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -6,6 +7,7 @@ const initialState = {
     username: null,
     token: null,
   },
+  entityVisible: 'notes',
   boards: [],
   notes: [],
   tasklists: [],
@@ -25,6 +27,22 @@ function rootReducer(state = initialState, action) {
               username: action.payload.username,
               token: action.payload.token,
             },
+          }
+      );
+    case UPDATE_NOTES:
+      return Object.assign(
+          {},
+          state,
+          {
+            notes: action.noteList,
+          }
+      );
+    case UPDATE_ENTITY_VISIBLE:
+      return Object.assign(
+          {},
+          state,
+          {
+            entityVisible: action.entityID,
           }
       );
     default:

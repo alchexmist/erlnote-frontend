@@ -2,8 +2,8 @@
 import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
 import {Row, Col} from 'react-bootstrap';
-import MainBar from './MainBar';
-import MainContent from './MainContent';
+import LoadMainBar from '../containers/LoadMainBar';
+import LoadMainContent from '../containers/LoadMainContent';
 
 class MainContainer extends Component {
   constructor(props) {
@@ -18,10 +18,10 @@ class MainContainer extends Component {
     return (
       <Container className="d-flex flex-column mb-auto p-0" fluid>
         <Row className="m-0">
-          <MainBar/>
+          <LoadMainBar />
         </Row>
         <Row className="ml-0 mr-0">
-          <MainContent />
+          <LoadMainContent />
         </Row>
       </Container>
     );

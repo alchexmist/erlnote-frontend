@@ -2,6 +2,7 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Form, FormControl, Button, Container, Row, Col} from 'react-bootstrap';
+import { ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS } from '../redux/constants/action-types';
 
 
 export default class MainBar extends Component {
@@ -13,25 +14,29 @@ export default class MainBar extends Component {
     // };
   }
 
+  dropDownOnSelect(eventKey, event) {
+    // this.props.setEntityVisible()
+    console.log("EventKey recibido: ", eventKey);
+  }
+
   render() {
     return (
       <Container className="p-0" fluid="true">
         <Navbar variant="dark" bg="dark" expand="xl" >
 
-          <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
+        {this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES && <Navbar.Brand>Notas</Navbar.Brand>}
+        {this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS && <Navbar.Brand>Pizarras</Navbar.Brand>}
+        {this.props.entityVisible === ENTITY_VISIBLE_ID_TASKLISTS && <Navbar.Brand>Listas de tareas</Navbar.Brand>}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-              <Nav.Link href="#link">Link</Nav.Link>
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
+              <NavDropdown title="Ir a" id="entity-nav-dropdown">
+                {this.props.entityVisible != ENTITY_VISIBLE_ID_TASKLISTS && <NavDropdown.Item eventKey={ENTITY_VISIBLE_ID_TASKLISTS} onSelect={this.dropDownOnSelect}>Listas de tareas</NavDropdown.Item>}
+                {this.props.entityVisible != ENTITY_VISIBLE_ID_NOTES && <NavDropdown.Item eventKey={ENTITY_VISIBLE_ID_NOTES} onSelect={this.dropDownOnSelect}>Notas</NavDropdown.Item>}
+                {this.props.entityVisible != ENTITY_VISIBLE_ID_BOARDS && <NavDropdown.Item eventKey={ENTITY_VISIBLE_ID_BOARDS} onSelect={this.dropDownOnSelect}>Pizarras</NavDropdown.Item>}
               </NavDropdown>
             </Nav>
+            <Button variant="outline-info">Crear</Button>
           </Navbar.Collapse>
         </Navbar>
       </Container>
