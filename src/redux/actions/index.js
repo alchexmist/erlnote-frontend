@@ -4,7 +4,7 @@ import {ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_ENTITY_VISIBLE} from '
 
 
 export function addAccount(payload) {
-  return {type: ADD_ACCOUNT, payload};
+  return {type: ADD_ACCOUNT, payload: payload};
 };
 
 export function deleteAccount() {
@@ -12,7 +12,7 @@ export function deleteAccount() {
 };
 
 export function updateNotes(noteList) {
-  return {type: UPDATE_NOTES, noteList};
+  return {type: UPDATE_NOTES, noteList: noteList};
 };
 
 export function updateEntityVisible(entityID) {
