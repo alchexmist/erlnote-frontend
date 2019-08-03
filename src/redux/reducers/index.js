@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
+import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -30,11 +30,47 @@ function rootReducer(state = initialState, action) {
           }
       );
     case UPDATE_NOTES:
+      const updatedNotes = state.notes.filter((note) => {
+        // const newIDs = action.noteList.map((updatedNote) => updatedNote.id);
+        // const notFoundIDs = newIDs.findIndex((id) => id == note.id) == -1;
+        // return notFoundIDs;
+        return action.noteList.map((updatedNote) => updatedNote.id).findIndex((id) => id == note.id) == -1;
+      });
       return Object.assign(
           {},
           state,
           {
-            notes: action.noteList,
+            notes: [...action.noteList, ...updatedNotes],
+          }
+      );
+    case UPDATE_BOARDS:
+      const updatedBoards = state.boards.filter((board) => {
+        // const newIDs = action.noteList.map((updatedNote) => updatedNote.id);
+        // const notFoundIDs = newIDs.findIndex((id) => id == note.id) == -1;
+        // return notFoundIDs;
+        return action.boardList.map((updatedBoard) => updatedBoard.id).findIndex((id) => id == board.id) == -1;
+      });
+      return Object.assign(
+          {},
+          state,
+          {
+            // boards: action.boardList,
+            boards: [...action.boardList, ...updatedBoards],
+          }
+      );
+    case UPDATE_TASKLISTS:
+      const updatedTasklists = state.tasklists.filter((tasklist) => {
+        // const newIDs = action.noteList.map((updatedNote) => updatedNote.id);
+        // const notFoundIDs = newIDs.findIndex((id) => id == note.id) == -1;
+        // return notFoundIDs;
+        return action.tasklistList.map((updatedTasklist) => updatedTasklist.id).findIndex((id) => id == tasklist.id) == -1;
+      });
+      return Object.assign(
+          {},
+          state,
+          {
+            // boards: action.boardList,
+            tasklists: [...action.tasklistList, ...updatedTasklists],
           }
       );
     case UPDATE_ENTITY_VISIBLE:

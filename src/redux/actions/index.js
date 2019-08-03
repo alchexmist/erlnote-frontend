@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
+import {ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
 
 
 export function addAccount(payload) {
@@ -13,6 +13,14 @@ export function deleteAccount() {
 
 export function updateNotes(noteList) {
   return {type: UPDATE_NOTES, noteList: noteList};
+};
+
+export function updateBoards(boardList) {
+  return {type: UPDATE_BOARDS, boardList: boardList};
+};
+
+export function updateTasklists(tasklistList) {
+  return {type: UPDATE_TASKLISTS, tasklistList: tasklistList};
 };
 
 export function updateEntityVisible(entityID) {
