@@ -1,11 +1,13 @@
 import {connect} from 'react-redux';
 import MainBar from '../components/MainBar';
-import {updateEntityVisible} from '../redux/actions/index';
+import {updateEntityVisible, setUserAction} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
   return {
     entityVisible: state.entityVisible,
+    userAction: state.userAction,
+    userActionEntityID: state.userActionEntityID,
   };
 };
 
@@ -13,6 +15,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setEntityVisible: (entityID) => {
       dispatch(updateEntityVisible(entityID));
+    },
+    setUserAction: (userAction) => {
+      dispatch(setUserAction(userAction));
     },
   };
 };

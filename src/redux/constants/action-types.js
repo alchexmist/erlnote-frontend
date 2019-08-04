@@ -8,3 +8,7 @@ export const UPDATE_ENTITY_VISIBLE = 'UPDATE_ENTITY_VISIBLE';
 export const ENTITY_VISIBLE_ID_NOTES = 'notes';
 export const ENTITY_VISIBLE_ID_BOARDS = 'boards';
 export const ENTITY_VISIBLE_ID_TASKLISTS = 'tasklists';
+
+export const SET_USER_ACTION = 'SET_USER_ACTION';
+export const ACTION_NONE = 'NONE';
+export const ACTION_CREATE_BOARD = 'ACTION_CREATE_BOARD';

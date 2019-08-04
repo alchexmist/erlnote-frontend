@@ -4,7 +4,19 @@
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Button, Container} from 'react-bootstrap';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
+import {ACTION_CREATE_BOARD} from '../redux/constants/action-types';
+import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
+import gql from 'graphql-tag';
+import {Mutation} from 'react-apollo';
 
+const CREATE_BOARD_MUTATION = gql`
+    mutation CreateBoard {
+      board: createBoard {
+        id
+        title
+        text
+      }
+    }`;
 
 export default class MainBar extends Component {
   constructor(props) {
@@ -21,7 +33,15 @@ export default class MainBar extends Component {
     console.log('EventKey recibido: ', eventKey);
   }
 
+  handleCreateBoardClick(userActionName, boardID) {
+    this.props.setUserAction({userActionName: userActionName, actionEntityID: boardID});
+  }
+
   render() {
+    if (this.props.userAction === ACTION_CREATE_BOARD) {
+      return <Redirect to={'/edit/board/' + this.props.userActionEntityID} />;
+    }
+
     return (
       <Container className="p-0" fluid="true">
         <Navbar variant="dark" bg="dark" expand="xl" >
@@ -40,7 +60,20 @@ export default class MainBar extends Component {
             </Nav>
             {this.props.entityVisible == ENTITY_VISIBLE_ID_TASKLISTS &&<Button variant="outline-info">Crear lista de tareas</Button>}
             {this.props.entityVisible == ENTITY_VISIBLE_ID_NOTES &&<Button variant="outline-info">Crear nota</Button>}
-            {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&<Button variant="outline-info">Crear pizarra</Button>}
+            {/* {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&<Button variant="outline-info" onClick={() => this.handleCreateBoardClick(ACTION_CREATE_BOARD)} >Crear pizarra</Button>} */}
+            {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&
+              <Mutation mutation={CREATE_BOARD_MUTATION}
+                onCompleted={({board}) => {
+                  console.log('Board ID: ', board.id);
+                  console.log('Board Title: ', board.title);
+                  console.log('Board Text: ', board.text);
+                  this.handleCreateBoardClick(ACTION_CREATE_BOARD, board.id);
+                }}>
+                {(createBoard, {data}) => (
+                  <Button variant="outline-info" onClick={() => createBoard()} >Crear pizarra</Button>
+                )}
+              </Mutation>
+            }
           </Navbar.Collapse>
         </Navbar>
       </Container>

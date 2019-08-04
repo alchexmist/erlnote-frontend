@@ -14,7 +14,9 @@ import RunLogin from './containers/RunLogin';
 import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
 import MainContainer from './components/MainContainer';
+import EditBoard from './components/EditBoard';
 import { ACCESS_TOKEN_PARAM } from './graphql-client';
+// import EditBoard from './components/EditBoard';
 
 // eslint-disable-next-line no-unused-vars
 const Page404 = ({location, info}) => (
@@ -51,6 +53,7 @@ function App() {
         <Route exact path="/" render={() => (localStorage.getItem(ACCESS_TOKEN_PARAM) ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
         {/* <Route path="/" exact component={RunLogin} /> */}
         <Route path="/dashboard" exact component={MainContainer} />
+        <Route path="/edit/board/:id" exact component={EditBoard} />
         <Route path="/signup" component={SignUp} />
         <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} />
         {/* when none of the above match, <BadRoute> will be rendered */}

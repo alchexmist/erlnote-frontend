@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
-import {Row, Col} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import LoadMainBar from '../containers/LoadMainBar';
 import LoadMainContent from '../containers/LoadMainContent';
 

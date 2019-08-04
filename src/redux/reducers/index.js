@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE} from '../constants/action-types';
+import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -7,6 +7,8 @@ const initialState = {
     username: null,
     token: null,
   },
+  userAction: ACTION_NONE,
+  userActionEntityID: '',
   entityVisible: 'notes',
   boards: [],
   notes: [],
@@ -79,6 +81,15 @@ function rootReducer(state = initialState, action) {
           state,
           {
             entityVisible: action.entityID,
+          }
+      );
+    case SET_USER_ACTION:
+      return Object.assign(
+          {},
+          state,
+          {
+            userAction: action.userActionName,
+            userActionEntityID: action.actionEntityID,
           }
       );
     default:
