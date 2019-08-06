@@ -33,8 +33,9 @@ export default class MainBar extends Component {
     console.log('EventKey recibido: ', eventKey);
   }
 
-  handleCreateBoardClick(userActionName, boardID) {
-    this.props.setUserAction({userActionName: userActionName, actionEntityID: boardID});
+  handleCreateBoardClick(userActionName, boardData) {
+    this.props.addNewBoard(boardData);
+    this.props.setUserAction({userActionName: userActionName, actionEntityID: boardData.boardID});
   }
 
   render() {
@@ -67,7 +68,7 @@ export default class MainBar extends Component {
                   console.log('Board ID: ', board.id);
                   console.log('Board Title: ', board.title);
                   console.log('Board Text: ', board.text);
-                  this.handleCreateBoardClick(ACTION_CREATE_BOARD, board.id);
+                  this.handleCreateBoardClick(ACTION_CREATE_BOARD, {boardID: board.id, boardTitle: board.title, boardText: board.text});
                 }}>
                 {(createBoard, {data}) => (
                   <Button variant="outline-info" onClick={() => createBoard()} >Crear pizarra</Button>

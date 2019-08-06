@@ -1,11 +1,16 @@
+/* eslint-disable max-len */
 import {connect} from 'react-redux';
-import MainBar from '../components/MainBar';
+import EditBoard from '../components/EditBoard';
 import {updateEntityVisible, setUserAction, addNewBoard} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
+  const boardData = state.boards.find((e) => e.id === state.userActionEntityID);
+
   return {
-    entityVisible: state.entityVisible,
+    boardID: (boardData != undefined) ? boardData.id : state.userActionEntityID,
+    boardTitle: (boardData != undefined) ? boardData.title : null,
+    boardText: (boardData != undefined) ? boardData.text : null,
     userAction: state.userAction,
     userActionEntityID: state.userActionEntityID,
   };
@@ -13,21 +18,15 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setEntityVisible: (entityID) => {
-      dispatch(updateEntityVisible(entityID));
-    },
     setUserAction: (userAction) => {
       dispatch(setUserAction(userAction));
-    },
-    addNewBoard: (boardData) => {
-      dispatch(addNewBoard(boardData));
     },
   };
 };
 
-const LoadMainBar = connect(
+const LoadEditBoard = connect(
     mapStateToProps,
     mapDispatchToProps
-)(MainBar);
+)(EditBoard);
 
-export default withRouter(LoadMainBar);
+export default withRouter(LoadEditBoard);
