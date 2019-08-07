@@ -8,6 +8,18 @@ import {Row, Col, Button, Form, InputGroup} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
 
+import gql from 'graphql-tag';
+import {Mutation} from 'react-apollo';
+
+const UPDATE_BOARD_MUTATION = gql`
+  mutation UpdateBoard($boardData: UpdateBoardInput!) {
+    board: updateBoard(input: $boardData) {
+      id
+      text
+      title
+    }
+  }`;
+
 class EditBoard extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +33,18 @@ class EditBoard extends Component {
     this.props.setUserAction({userActionName: ACTION_NONE, actionEntityID: this.props.match.params.id});
   }
 
+  handleTextAreaChange(updateBoard, e) {
+    console.log('EVENTOTEXTAREA', e.target.value);
+    updateBoard({variables: {boardData: {
+      'id': this.props.boardID,
+      'text': e.target.value,
+      'title': this.props.boardTitle,
+    }}});
+  }
+
+//   FALTA ACTUALIZAR REDUX STORE
+//   FALTA ACTUALIZAR TITLE EN EVENTO
+//   FALTA EMBEBER MUTACIONES EN SUSCRIPCIÓN.
   render() {
     //   {/* EL IDENTIFICADOR DEL TABLERO DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
@@ -47,17 +71,21 @@ class EditBoard extends Component {
               </InputGroup>
             </Form.Group>
           </Form.Row>
-
-          <Form.Row>
-            <Form.Group as={Col} controlId="formGridBoardTextArea">
-              <InputGroup className="mb-3">
-                <InputGroup.Prepend>
-                  <InputGroup.Text id="ig-text">Contenido</InputGroup.Text>
-                </InputGroup.Prepend>
-                <Form.Control as="textarea" rows="10" defaultValue={this.props.boardText} />
-              </InputGroup>
-            </Form.Group>
-          </Form.Row>
+        
+          <Mutation mutation={UPDATE_BOARD_MUTATION}>
+            {(updateBoard, {data}) => (
+              <Form.Row>
+                <Form.Group as={Col} controlId="formGridBoardTextArea">
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="ig-text">Contenido</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <Form.Control as="textarea" rows="10" defaultValue={this.props.boardText} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} />
+                  </InputGroup>
+                </Form.Group>
+              </Form.Row>
+            )}
+          </Mutation>
 
           <Button variant="primary" type="submit">
     Submit
