@@ -2,7 +2,7 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
-import {Row, Col, Button, SplitButton, Dropdown, Form, InputGroup} from 'react-bootstrap';
+import {Row, Col, Button, ButtonGroup, SplitButton, Dropdown, Form, InputGroup} from 'react-bootstrap';
 // import LoadMainBar from '../containers/LoadMainBar';
 // import LoadMainContent from '../containers/LoadMainContent';
 import {withRouter} from 'react-router-dom';
@@ -24,6 +24,13 @@ const ADD_BOARD_CONTRIBUTOR_MUTATION = gql`
 mutation AddBoardContributor($data: AddBoardContributorFilter!) {
     addBoardContributor(filter: $data) {
     msg
+}}`;
+
+const DELETE_BOARD_USER_MUTATION = gql`
+mutation DeleteBoardUser($data: ID!) {
+    deleteBoardUser(boardId: $data) {
+    id
+    title
 }}`;
 
 class EditBoard extends Component {
@@ -58,10 +65,15 @@ class EditBoard extends Component {
     }}});
   }
 
-  handleAddContributorClick(e) {
+  handleAddContributorClick(addBoardContributor, e) {
     e.preventDefault();
     console.log('ADDCONTRIBUTOR', this.state.contributorID);
-    //AQUI HAY QUE DISPARAR LA MUTATION ADD_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorID e BOARD_ID this.props.boardID
+    // AQUI HAY QUE DISPARAR LA MUTATION ADD_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorID e BOARD_ID this.props.boardID
+    addBoardContributor({variables: {data: {
+      'type': 'ID',
+      'value': this.state.contributorID,
+      'bid': this.props.boardID,
+    }}});
     this.setState({contributorID: ''});
   }
 
@@ -144,12 +156,25 @@ class EditBoard extends Component {
                 <Form.Control
                   placeholder="Añadir ID de colaborador"
                   aria-label="Añadir ID de colaborador"
+                  value={this.state.contributorID}
                   onChange={(e) => this.setState({contributorID: e.target.value})}
                 />
                 <InputGroup.Append>
-                  <SplitButton title="Añadir" variant="primary" id="add-contributor-btn" key="add-contributor" onClick={(e) => this.handleAddContributorClick(e)}>
-                    <Dropdown.Item eventKey="1">Eliminar</Dropdown.Item>
-                  </SplitButton>
+                  <Dropdown as={ButtonGroup}>
+                    <Mutation mutation={ADD_BOARD_CONTRIBUTOR_MUTATION}
+                      onCompleted={({addBoardContributor}) => {
+                        console.log('Añadido colaborador a pizarra: ', addBoardContributor.msg);
+                      }}>
+                      {(addBoardContributor, {data}) => (
+                        <Button variant="primary" onClick={(e) => this.handleAddContributorClick(addBoardContributor, e)}>Añadir</Button>
+                      )}
+                    </Mutation>
+                    <Dropdown.Toggle split variant="primary" id="dropdown-split-add-contributor" />
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item eventKey="1">Eliminar</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </InputGroup.Append>
               </InputGroup>
             </Form.Group>
