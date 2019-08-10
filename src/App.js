@@ -11,11 +11,12 @@ import Col from 'react-bootstrap/Col';
 import './App.css';
 import Login from './Login';
 import RunLogin from './containers/RunLogin';
-import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
 import MainContainer from './components/MainContainer';
+import AppHeaderContainer from './containers/AppHeaderContainer';
 import LoadEditBoard from './containers/LoadEditBoard';
-import { ACCESS_TOKEN_PARAM } from './graphql-client';
+import {ACCESS_TOKEN_PARAM} from './graphql-client';
+
 // import EditBoard from './components/EditBoard';
 
 // eslint-disable-next-line no-unused-vars
@@ -47,7 +48,7 @@ const Protected = (props) => <h3>{props.extra}</h3>
 function App() {
   return (
     <BrowserRouter>
-      <AppHeader />
+      <AppHeaderContainer />
       <Switch>
         {/* <Route exact path="/login" component={Login} /> */}
         <Route exact path="/" render={() => (localStorage.getItem(ACCESS_TOKEN_PARAM) ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>

@@ -23,7 +23,7 @@ import {ApolloProvider} from 'react-apollo';
 // import {phoenixSocket} from './graphql-client/absinthe-socket-link';
 
 
-window.localStorage.removeItem(ACCESS_TOKEN_PARAM);
+// window.localStorage.removeItem(ACCESS_TOKEN_PARAM);
 
 // graphqlClient.mutate({
 //   variables: { },

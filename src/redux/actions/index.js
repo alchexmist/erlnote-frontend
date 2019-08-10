@@ -1,7 +1,11 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION} from '../constants/action-types';
 
+
+export function logout() {
+  return {type: LOGOUT};
+};
 
 export function addAccount(payload) {
   return {type: ADD_ACCOUNT, payload: payload};

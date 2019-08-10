@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -19,6 +19,8 @@ const initialState = {
 // eslint-disable-next-line require-jsdoc
 function rootReducer(state = initialState, action) {
   switch (action.type) {
+    case LOGOUT:
+      return initialState;
     case ADD_ACCOUNT:
       return Object.assign(
           {},
