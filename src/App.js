@@ -12,10 +12,12 @@ import './App.css';
 import Login from './Login';
 import RunLogin from './containers/RunLogin';
 import AppFooter from './components/AppFooter';
+import SignUp from './components/SignUp';
 import MainContainer from './components/MainContainer';
 import AppHeaderContainer from './containers/AppHeaderContainer';
 import LoadEditBoard from './containers/LoadEditBoard';
 import {ACCESS_TOKEN_PARAM} from './graphql-client';
+import {withRouter} from 'react-router-dom';
 
 // import EditBoard from './components/EditBoard';
 
@@ -41,22 +43,25 @@ Page404.propTypes = {
   info: PropTypes.string.isRequired,
 };
 
-const SignUp = () => <h3>SignUp</h3>
+// const SignUp = () => <h3>SignUp</h3>
 const Protected = (props) => <h3>{props.extra}</h3>
 
 // eslint-disable-next-line require-jsdoc
 function App() {
+  const existToken = () => (localStorage.getItem(ACCESS_TOKEN_PARAM));
   return (
     <BrowserRouter>
       <AppHeaderContainer />
       <Switch>
         {/* <Route exact path="/login" component={Login} /> */}
-        <Route exact path="/" render={() => (localStorage.getItem(ACCESS_TOKEN_PARAM) ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
         {/* <Route path="/" exact component={RunLogin} /> */}
-        <Route path="/dashboard" exact component={MainContainer} />
-        <Route path="/edit/board/:id" exact component={LoadEditBoard} />
-        <Route path="/signup" component={SignUp} />
-        <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} />
+        {/* <Route path="/dashboard" exact component={MainContainer} /> */}
+        {/* <Route path="/edit/board/:id" exact component={LoadEditBoard} /> */}
+        {/* <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} /> */}
+        <Route exact path="/" render={() => (existToken() ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
+        <Route exact path="/dashboard" render={() => (existToken() ? (<MainContainer />) : (<RunLogin />))}/>
+        <Route exact path="/edit/board/:id" render={() => (existToken() ? (<LoadEditBoard />) : (<RunLogin />))}/>
+        <Route exact path="/signup" component={SignUp} />
         {/* when none of the above match, <BadRoute> will be rendered */}
         <Route render={(props) => <Page404 {...props} info="INSERT COIN..." />} />
       </Switch>

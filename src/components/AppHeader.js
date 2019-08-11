@@ -14,16 +14,29 @@ class AppHeader extends Component {
   }
 
   isAuth() {
-    return this.props.userID && this.props.userName && this.props.token;
+    const isLogged = this.props.userID !== null && this.props.userName !== null && this.props.token !== null;
+    if (!isLogged && window.localStorage.getItem(ACCESS_TOKEN_PARAM)) {
+      window.localStorage.removeItem(ACCESS_TOKEN_PARAM);
+    }
+    return isLogged;
   }
 
   handleLogoutButtonClick(e) {
     this.props.logout();
     window.localStorage.removeItem(ACCESS_TOKEN_PARAM);
-    // this.props.history.push('/');
+    // Redirección a la página de login
+    this.props.history.push('/');
+  }
+
+  handleSignUpButtonClick(e) {
+    this.props.history.push('/signup');
   }
 
   render() {
+    // if (!this.isAuth()) {
+    //   return <Redirect to={'/'} />;
+    // }
+
     return (
       <Container className="p-0" fluid="true">
         <Row className="flex-column m-0">
@@ -39,11 +52,12 @@ class AppHeader extends Component {
                 <Navbar.Text className="mr-3">{this.props.userName} ({this.props.userID})</Navbar.Text>
                 <Button variant="outline-light" onClick={(e) => this.handleLogoutButtonClick(e)}>Cerrar sesión</Button>
               </Form>}
+              {console.log('ISAUTH', this.isAuth())}
               {!this.isAuth() &&
               <Form inline>
                 <Navbar.Text className="mr-3">Usuario anónimo</Navbar.Text>
-                <Button variant="outline-light" >Registrarse</Button>
-              </Form> && <Redirect to={'/'} />}
+                <Button variant="outline-light" onClick={(e) => this.handleSignUpButtonClick(e)}>Registrarse</Button>
+              </Form>}
             </Navbar.Collapse>
           </Navbar>
         </Row>
