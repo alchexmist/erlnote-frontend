@@ -2,7 +2,7 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Form, FormControl, Button, Container, Row, Col, CardColumns, Card} from 'react-bootstrap';
-
+import LoadBoards from '../containers/LoadBoards';
 import gql from 'graphql-tag';
 import {Query} from 'react-apollo';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
@@ -24,22 +24,22 @@ const GET_NOTES = gql`
   }
 `;
 
-const GET_BOARDS = gql`
-  {
-      me {
-        ownerBoards {
-          id
-          title
-          text
-        }
-        contributorBoards {
-          id
-          title
-          text
-        }
-      } 
-  }
-`;
+// const GET_BOARDS = gql`
+//   {
+//       me {
+//         ownerBoards {
+//           id
+//           title
+//           text
+//         }
+//         contributorBoards {
+//           id
+//           title
+//           text
+//         }
+//       } 
+//   }
+// `;
 
 const GET_TASKLISTS = gql`
   {
@@ -110,35 +110,34 @@ const Notes = ({noteListRequest}) => (
   </Query>
 );
 
-const Boards = ({boardListRequest}) => (
-  <Query query={GET_BOARDS}
-    onCompleted={({me}) => {
-      boardListRequest(me.ownerBoards);
-      boardListRequest(me.contributorBoards);
-    // client.writeData({ data: { isLoggedIn: true } });
-    }}
-  >
-    {({loading, error, data}) => {
-      if (loading) return 'Loading...';
-      if (error) return `Error! ${error.message}`;
+// const Boards = ({boardListRequest}) => (
+//   <Query query={GET_BOARDS}
+//     onCompleted={({me}) => {
+//       boardListRequest(me.ownerBoards);
+//       boardListRequest(me.contributorBoards);
+//     }}
+//   >
+//     {({loading, error, data}) => {
+//       if (loading) return 'Loading...';
+//       if (error) return `Error! ${error.message}`;
 
-      // eslint-disable-next-line react/display-name
-      const parseBoardData = (boardData) =>
-        <Card key={boardData.id}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>;
+//       // eslint-disable-next-line react/display-name
+//       const parseBoardData = (boardData) =>
+//         <Card key={boardData.id}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>;
 
-      return (
-        <ul>
-          {
-            data.me.ownerBoards.map(parseBoardData)
-          }
-          {
-            data.me.contributorBoards.map(parseBoardData)
-          }
-        </ul>
-      );
-    }}
-  </Query>
-);
+//       return (
+//         <ul>
+//           {
+//             data.me.ownerBoards.map(parseBoardData)
+//           }
+//           {
+//             data.me.contributorBoards.map(parseBoardData)
+//           }
+//         </ul>
+//       );
+//     }}
+//   </Query>
+// );
 
 const Tasklists = ({tasklistListRequest}) => (
   <Query query={GET_TASKLISTS}
@@ -191,7 +190,7 @@ export default class MainContent extends Component {
           <Notes noteListRequest={this.props.noteListRequest}/>
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS &&
-          <Boards boardListRequest={this.props.boardListRequest}/>
+          <LoadBoards />
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_TASKLISTS &&
           <Tasklists tasklistListRequest={this.props.tasklistListRequest}/>

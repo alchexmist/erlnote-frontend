@@ -15,3 +15,4 @@ export const ENTITY_VISIBLE_ID_TASKLISTS = 'tasklists';
 export const SET_USER_ACTION = 'SET_USER_ACTION';
 export const ACTION_NONE = 'NONE';
 export const ACTION_CREATE_BOARD = 'ACTION_CREATE_BOARD';
+export const ACTION_EDIT_BOARD = 'ACTION_EDIT_BOARD';

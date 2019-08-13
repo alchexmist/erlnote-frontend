@@ -26,6 +26,12 @@ mutation AddBoardContributor($data: AddBoardContributorFilter!) {
     msg
 }}`;
 
+const DELETE_BOARD_CONTRIBUTOR_MUTATION = gql`
+mutation DeleteBoardContributor($data: DeleteBoardContributorFilter!) {
+    deleteBoardContributor(filter: $data) {
+    msg
+}}`;
+
 const DELETE_BOARD_USER_MUTATION = gql`
 mutation DeleteBoardUser($data: ID!) {
     deleteBoardUser(boardId: $data) {
@@ -37,7 +43,7 @@ class EditBoard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {contributorID: ''};
+    this.state = {contributorUserName: ''};
     // this.state = {
 
     // };
@@ -67,14 +73,26 @@ class EditBoard extends Component {
 
   handleAddContributorClick(addBoardContributor, e) {
     e.preventDefault();
-    console.log('ADDCONTRIBUTOR', this.state.contributorID);
-    // AQUI HAY QUE DISPARAR LA MUTATION ADD_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorID e BOARD_ID this.props.boardID
+    console.log('ADDCONTRIBUTOR', this.state.contributorUserName);
+    // AQUI HAY QUE DISPARAR LA MUTATION ADD_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorUserName e BOARD_ID this.props.boardID
     addBoardContributor({variables: {data: {
-      'type': 'ID',
-      'value': this.state.contributorID,
+      'type': 'USERNAME',
+      'value': this.state.contributorUserName,
       'bid': this.props.boardID,
     }}});
-    this.setState({contributorID: ''});
+    this.setState({contributorUserName: ''});
+  }
+
+  handleDeleteContributorClick(deleteBoardContributor, e) {
+    e.preventDefault();
+    console.log('DELETECONTRIBUTOR', this.state.contributorUserName);
+    // AQUI HAY QUE DISPARAR LA MUTATION DELETE_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorUserName e BOARD_ID this.props.boardID
+    deleteBoardContributor({variables: {data: {
+      'type': 'USERNAME',
+      'value': this.state.contributorUserName,
+      'bid': this.props.boardID,
+    }}});
+    this.setState({contributorUserName: ''});
   }
 
   //   FALTA ACTUALIZAR REDUX STORE
@@ -151,13 +169,13 @@ class EditBoard extends Component {
             <Form.Group as={Col} lg="4" md="4" sm="4" xl="4" xs="4" controlId="formGridBoardAddContributor">
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
-                  <InputGroup.Text id="ig-cid">CID</InputGroup.Text>
+                  <InputGroup.Text id="ig-contributor-username">Nick</InputGroup.Text>
                 </InputGroup.Prepend>
                 <Form.Control
-                  placeholder="Añadir ID de colaborador"
-                  aria-label="Añadir ID de colaborador"
-                  value={this.state.contributorID}
-                  onChange={(e) => this.setState({contributorID: e.target.value})}
+                  placeholder="Añadir colaborador"
+                  aria-label="Añadir colaborador"
+                  value={this.state.contributorUserName}
+                  onChange={(e) => this.setState({contributorUserName: e.target.value})}
                 />
                 <InputGroup.Append>
                   <Dropdown as={ButtonGroup}>
@@ -172,7 +190,14 @@ class EditBoard extends Component {
                     <Dropdown.Toggle split variant="primary" id="dropdown-split-add-contributor" />
 
                     <Dropdown.Menu>
-                      <Dropdown.Item eventKey="1">Eliminar</Dropdown.Item>
+                      <Mutation mutation={DELETE_BOARD_CONTRIBUTOR_MUTATION}
+                        onCompleted={({deleteBoardContributor}) => {
+                          console.log('Eliminado colaborador de pizarra: ', deleteBoardContributor.msg);
+                        }}>
+                        {(deleteBoardContributor, {data}) => (
+                          <Dropdown.Item eventKey="1" onClick={(e) => this.handleDeleteContributorClick(deleteBoardContributor, e)}>Eliminar</Dropdown.Item>
+                        )}
+                      </Mutation>
                     </Dropdown.Menu>
                   </Dropdown>
                 </InputGroup.Append>
@@ -183,7 +208,7 @@ class EditBoard extends Component {
             </Form.Group>
           </Form.Row>
 
-          <Button variant="primary" type="text">
+          <Button variant="primary" type="text" onClick={() => this.props.history.push('/')}>
                 Volver a la página principal
           </Button>
         </Form>
