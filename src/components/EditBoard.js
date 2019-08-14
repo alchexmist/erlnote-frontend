@@ -39,6 +39,8 @@ mutation DeleteBoardUser($data: ID!) {
     title
 }}`;
 
+const fixAccentMark = (string) => string.replace(/\´a/g, 'á').replace(/\´e/g, 'é').replace(/\´i/g, 'í').replace(/\´o/g, 'ó').replace(/\´u/g, 'ú').replace(/\´A/g, 'Á').replace(/\´E/g, 'É').replace(/\´I/g, 'Í').replace(/\´O/g, 'Ó').replace(/\´U/g, 'Ú');
+
 class EditBoard extends Component {
   constructor(props) {
     super(props);
@@ -54,20 +56,20 @@ class EditBoard extends Component {
   }
 
   handleTextAreaChange(updateBoard, e) {
-    console.log('EVENTOTEXTAREA', e.target.value);
+    const newText = fixAccentMark(e.target.value);
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
-      'text': e.target.value,
+      'text': newText,
       'title': this.props.boardTitle,
     }}});
   }
 
   handleTitleChange(updateBoard, e) {
-    console.log('EVENTOTEXTAREA', e.target.value);
+    const newTitle = fixAccentMark(e.target.value);
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': this.props.boardText,
-      'title': e.target.value,
+      'title': newTitle,
     }}});
   }
 
@@ -132,7 +134,7 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-title">Título</InputGroup.Text>
                     </InputGroup.Prepend>
-                    <Form.Control type="text" placeholder="Título de la pizarra" defaultValue={this.props.boardTitle} onChange={(e) => this.handleTitleChange(updateBoard, e)} />
+                    <Form.Control type="text" placeholder="Título de la pizarra" value={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} />
                   </InputGroup>
                 </Form.Group>
               )}
@@ -158,7 +160,7 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-text">Contenido</InputGroup.Text>
                     </InputGroup.Prepend>
-                    <Form.Control as="textarea" rows="10" defaultValue={this.props.boardText} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} />
+                    <Form.Control as="textarea" rows="10" value={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} />
                   </InputGroup>
                 </Form.Group>
               </Form.Row>
@@ -208,7 +210,10 @@ class EditBoard extends Component {
             </Form.Group>
           </Form.Row>
 
-          <Button variant="primary" type="text" onClick={() => this.props.history.push('/')}>
+          <Button variant="primary" type="text" onClick={(e) => {
+            e.preventDefault();
+            this.props.history.push('/');
+          }}>
                 Volver a la página principal
           </Button>
         </Form>

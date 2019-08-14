@@ -8,9 +8,9 @@ const mapStateToProps = (state) => {
   const boardData = state.boards.find((e) => e.id === state.userActionEntityID);
 
   return {
-    boardID: (boardData != undefined) ? boardData.id : state.userActionEntityID,
-    boardTitle: (boardData != undefined) ? boardData.title : null,
-    boardText: (boardData != undefined) ? boardData.text : null,
+    boardID: (boardData != undefined && boardData != null) ? boardData.id : state.userActionEntityID,
+    boardTitle: (boardData != undefined && boardData != null) ? boardData.title : '',
+    boardText: (boardData != undefined && boardData != null) ? boardData.text : '',
     userAction: state.userAction,
     userActionEntityID: state.userActionEntityID,
   };
