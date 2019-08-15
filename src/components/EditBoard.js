@@ -106,15 +106,17 @@ class EditBoard extends Component {
     return (
       <Container className="my-3">
         <Form>
-          {/* <Subscription
+          <Subscription
             subscription={BOARD_UPDATED_SUBSCRIPTION}
             variables={{boardId: this.props.boardID}}
             shouldResubscribe={true}
             onSubscriptionData={({subscriptionData}) => {
-              console.log('Suscripción realizada con éxito.');
+              const data = subscriptionData.data.boardUpdated;
+              console.log('Suscripción realizada con éxito: ', data);
+              this.props.updateBoard(data);
             }}>
-
-          </Subscription> */}
+{/* ACTUALIZAR EL BOARD EN REDUX CON data.id data.text data.title */}
+          </Subscription>
 
           <Form.Row>
             <Form.Group as={Col} lg="2" md="2" sm="2" xl="2" xs="2" controlId="formGridBoardID">
