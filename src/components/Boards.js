@@ -48,6 +48,7 @@ class Boards extends Component {
 
     return (
       <Query query={GET_BOARDS}
+        fetchPolicy={'cache-and-network'}
         onCompleted={({me}) => {
           this.props.boardListRequest(me.ownerBoards);
           this.props.boardListRequest(me.contributorBoards);

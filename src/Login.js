@@ -14,6 +14,8 @@ import {ACCESS_TOKEN_PARAM} from './graphql-client';
 import {Alert} from 'react-bootstrap';
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 
+import {phoenixSocket} from './graphql-client/absinthe-socket-link';
+
 const LOGIN_MUTATION = gql`
     mutation Login($email: String!, $password: String!) {
       login(email: $email, password: $password) {
@@ -86,6 +88,7 @@ export default class Login extends Component {
                   console.log('ID: ', login.user.id);
                   this.props.onLoginClick(login.user.id, login.user.username, login.token);
                   localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
+                  if (phoenixSocket.conn !== undefined) phoenixSocket.conn.close();
                   console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
                   this.setState({redirectToDashboard: true});
                   // client.writeData({ data: { isLoggedIn: true } });

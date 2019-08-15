@@ -9,7 +9,7 @@ import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
 
 import gql from 'graphql-tag';
-import {Mutation} from 'react-apollo';
+import {Mutation, Subscription} from 'react-apollo';
 
 const UPDATE_BOARD_MUTATION = gql`
   mutation UpdateBoard($boardData: UpdateBoardInput!) {
@@ -32,11 +32,12 @@ mutation DeleteBoardContributor($data: DeleteBoardContributorFilter!) {
     msg
 }}`;
 
-const DELETE_BOARD_USER_MUTATION = gql`
-mutation DeleteBoardUser($data: ID!) {
-    deleteBoardUser(boardId: $data) {
+const BOARD_UPDATED_SUBSCRIPTION = gql`
+subscription BoardUpdated($boardId: ID!) {
+    boardUpdated(boardId: $boardId) {
     id
     title
+    text
 }}`;
 
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á').replace(/\´e/g, 'é').replace(/\´i/g, 'í').replace(/\´o/g, 'ó').replace(/\´u/g, 'ú').replace(/\´A/g, 'Á').replace(/\´E/g, 'É').replace(/\´I/g, 'Í').replace(/\´O/g, 'Ó').replace(/\´U/g, 'Ú');
@@ -105,6 +106,16 @@ class EditBoard extends Component {
     return (
       <Container className="my-3">
         <Form>
+          {/* <Subscription
+            subscription={BOARD_UPDATED_SUBSCRIPTION}
+            variables={{boardId: this.props.boardID}}
+            shouldResubscribe={true}
+            onSubscriptionData={({subscriptionData}) => {
+              console.log('Suscripción realizada con éxito.');
+            }}>
+
+          </Subscription> */}
+
           <Form.Row>
             <Form.Group as={Col} lg="2" md="2" sm="2" xl="2" xs="2" controlId="formGridBoardID">
               {/* <Form.Label>Password</Form.Label> */}

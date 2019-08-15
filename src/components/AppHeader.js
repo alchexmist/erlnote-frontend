@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import {LinkContainer} from 'react-router-bootstrap';
 import {ACCESS_TOKEN_PARAM} from '../graphql-client';
 import {Redirect} from 'react-router-dom';
+import {phoenixSocket} from '../graphql-client/absinthe-socket-link';
 
 class AppHeader extends Component {
   constructor(props) {
@@ -24,6 +25,7 @@ class AppHeader extends Component {
   handleLogoutButtonClick(e) {
     this.props.logout();
     window.localStorage.removeItem(ACCESS_TOKEN_PARAM);
+    if (phoenixSocket.conn !== undefined) phoenixSocket.conn.close();
     // Redirección a la página de login
     this.props.history.push('/');
   }
