@@ -8,6 +8,7 @@ const mapStateToProps = (state) => {
   const boardData = state.boards.find((e) => e.id === state.userActionEntityID);
 
   return {
+    currentUserID: state.account.userID,
     boardID: (boardData != undefined && boardData != null) ? boardData.id : state.userActionEntityID,
     boardTitle: (boardData != undefined && boardData != null) ? boardData.title : '',
     boardText: (boardData != undefined && boardData != null) ? boardData.text : '',

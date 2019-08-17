@@ -17,6 +17,7 @@ const UPDATE_BOARD_MUTATION = gql`
       id
       text
       title
+      updated_by
     }
   }`;
 
@@ -38,6 +39,7 @@ subscription BoardUpdated($boardId: ID!) {
     id
     title
     text
+    updated_by
 }}`;
 
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á').replace(/\´e/g, 'é').replace(/\´i/g, 'í').replace(/\´o/g, 'ó').replace(/\´u/g, 'ú').replace(/\´A/g, 'Á').replace(/\´E/g, 'É').replace(/\´I/g, 'Í').replace(/\´O/g, 'Ó').replace(/\´U/g, 'Ú');
@@ -46,32 +48,80 @@ class EditBoard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {contributorUserName: ''};
-    // this.state = {
+    this.state = {
+      contributorUserName: '',
+      titleCursorOffset: 0,
+      textAreaCursorOffset: 0,
+    };
 
-    // };
+    // Referencia (Ref) a entrada de título
+    this.titleInput = React.createRef();
+    // Referencia (Ref) al contenido de la pizarra
+    this.textAreaInput = React.createRef();
+
+    this.moreMutations = 0;
   }
 
   componentDidMount() {
     this.props.setUserAction({userActionName: ACTION_NONE, actionEntityID: this.props.match.params.id});
   }
 
+  // setMoreMutations() {
+  //   if (this.state === undefined || this.state.moreMutations === true) {
+  //     window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
+  //   } else {
+  //     this.setState({moreMutations: true});
+  //   }
+  // }
+
+  // unsetMoreMutations() {
+  //   this.setState({moreMutations: false});
+  // }
+
+  setMoreMutations() {
+    if (this.moreMutations > 0) {
+      window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
+    } else {
+      this.moreMutations += 1;
+    }
+  }
+
+  unsetMoreMutations() {
+    this.moreMutations -= 1;
+  }
+
+  // componentDidUpdate(prevProps) {
+  //   console.log('COMPONENTDIDUPDATE TITLE CURRENT VALUE: ', this.titleInput.current.value);
+  //   this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+  // }
+
   handleTextAreaChange(updateBoard, e) {
+    this.setMoreMutations();
     const newText = fixAccentMark(e.target.value);
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': newText,
       'title': this.props.boardTitle,
     }}});
+    const cursorStart = e.target.selectionStart;
+    this.textAreaInput.current.value = newText;
+    this.setState({textAreaCursorOffset: cursorStart});
   }
 
   handleTitleChange(updateBoard, e) {
+    this.setMoreMutations();
     const newTitle = fixAccentMark(e.target.value);
+    console.log('TITLE SIN ENVIAR: ', newTitle);
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': this.props.boardText,
       'title': newTitle,
     }}});
+
+    const cursorStart = e.target.selectionStart;
+    //this.titleInput.current.value = newTitle;
+    console.log('TITLE CURSOR OFFSET: ', cursorStart);
+    this.setState({titleCursorOffset: cursorStart});
   }
 
   handleAddContributorClick(addBoardContributor, e) {
@@ -106,7 +156,7 @@ class EditBoard extends Component {
     return (
       <Container className="my-3">
         <Form>
-          <Subscription
+          {/* <Subscription
             subscription={BOARD_UPDATED_SUBSCRIPTION}
             variables={{boardId: this.props.boardID}}
             shouldResubscribe={true}
@@ -114,10 +164,31 @@ class EditBoard extends Component {
               const data = subscriptionData.data.boardUpdated;
               console.log('Suscripción realizada con éxito: ', data);
               this.props.updateBoard(data);
+              // this.titleInput.current.value = data.title;
+              // this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+              this.textAreaInput.current.value = data.text;
+              this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
             }}>
-{/* ACTUALIZAR EL BOARD EN REDUX CON data.id data.text data.title */}
-          </Subscription>
+          </Subscription> */}
 
+          <Subscription
+            subscription={BOARD_UPDATED_SUBSCRIPTION}
+            variables={{boardId: this.props.boardID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.boardUpdated;
+              if (data.updated_by !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA');
+                console.log('Suscripción realizada con éxito: ', data);
+                this.props.updateBoard(data);
+                this.titleInput.current.value = data.title;
+                this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+                this.textAreaInput.current.value = data.text;
+                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+              } else {
+                console.log('SUSCRIPCIÓN IGNORADA');
+              }
+            }}>
+          </Subscription>
           <Form.Row>
             <Form.Group as={Col} lg="2" md="2" sm="2" xl="2" xs="2" controlId="formGridBoardID">
               {/* <Form.Label>Password</Form.Label> */}
@@ -131,15 +202,16 @@ class EditBoard extends Component {
             </Form.Group>
             <Mutation mutation={UPDATE_BOARD_MUTATION}
               onCompleted={({board}) => {
-                console.log('Board ID: ', board.id);
-                console.log('Board Title: ', board.title);
-                console.log('Board Text: ', board.text);
+                console.log('RECIBIDO TITLE MUTATION Board ID: ', board.id);
+                console.log('RECIBIDO TITLE MUTATION Board Title: ', board.title);
+                console.log('RECIBIDO TITLE MUTATION Board Text: ', board.text);
+                console.log('RECIBIDO TITLE MUTATION Board Updated By: ', board.updated_by);
                 this.props.updateBoard({id: board.id, title: board.title, text: board.text, __typename: 'Board'});
-                // this.props.onLoginClick(login.user.id, login.user.username, login.token);
-                // localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
-                // console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
-                // this.setState({redirectToDashboard: true});
-                // client.writeData({ data: { isLoggedIn: true } });
+                this.titleInput.current.value = board.title;
+                this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+                this.textAreaInput.current.value = board.text;
+                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+                this.unsetMoreMutations();
               }}>
               {(updateBoard, {data}) => (
                 <Form.Group as={Col} controlId="formGridBoardTitle">
@@ -147,7 +219,8 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-title">Título</InputGroup.Text>
                     </InputGroup.Prepend>
-                    <Form.Control type="text" placeholder="Título de la pizarra" value={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} />
+                    {/* <Form.Control ref={this.titleInput} type="text" placeholder="Título de la pizarra" value={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} /> */}
+                    <Form.Control ref={this.titleInput} type="text" placeholder="Título de la pizarra" defaultValue={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})} />
                   </InputGroup>
                 </Form.Group>
               )}
@@ -156,10 +229,16 @@ class EditBoard extends Component {
 
           <Mutation mutation={UPDATE_BOARD_MUTATION}
             onCompleted={({board}) => {
-              console.log('Board ID: ', board.id);
-              console.log('Board Title: ', board.title);
-              console.log('Board Text: ', board.text);
+              console.log('RECIBIDO CONTENT MUTATION Board ID: ', board.id);
+              console.log('RECIBIDO CONTENT MUTATION Board Title: ', board.title);
+              console.log('RECIBIDO CONTENT MUTATION Board Text: ', board.text);
+              console.log('RECIBIDO CONTENT MUTATION Board Updated By: ', board.updated_by);
               this.props.updateBoard({id: board.id, title: board.title, text: board.text, __typename: 'Board'});
+              this.titleInput.current.value = board.title;
+              this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+              this.textAreaInput.current.value = board.text;
+              this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+              this.unsetMoreMutations();
             // this.props.onLoginClick(login.user.id, login.user.username, login.token);
             // localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
             // console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
@@ -173,7 +252,8 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-text">Contenido</InputGroup.Text>
                     </InputGroup.Prepend>
-                    <Form.Control as="textarea" rows="10" value={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} />
+                    {/* <Form.Control as="textarea" rows="10" value={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} /> */}
+                    <Form.Control ref={this.textAreaInput} as="textarea" rows="10" defaultValue={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} onClick={(e) => this.setState({textAreaCursorOffset: e.target.selectionStart})} />
                   </InputGroup>
                 </Form.Group>
               </Form.Row>
