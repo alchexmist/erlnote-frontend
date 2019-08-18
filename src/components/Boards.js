@@ -49,9 +49,18 @@ class Boards extends Component {
     return (
       <Query query={GET_BOARDS}
         fetchPolicy={'cache-and-network'}
+        pollInterval={5000}
         onCompleted={({me}) => {
-          this.props.boardListRequest(me.ownerBoards);
-          this.props.boardListRequest(me.contributorBoards);
+          if (!(me.ownerBoards.every((e) => this.props.boards.includes(e)))) {
+            console.log('OWNER BOARDS RECEIVED: ', me.ownerBoards);
+            console.log('OWNER BOARDS STATE: ', this.props.boards);
+            this.props.boardListRequest(me.ownerBoards);
+          }
+          if (!(me.contributorBoards.every((e) => this.props.boards.includes(e)))) {
+            console.log('CONTRIBUTOR BOARDS RECEIVED: ', me.contributorBoards);
+            console.log('CONTRIBUTOR BOARDS STATE: ', this.props.boards);
+            this.props.boardListRequest(me.contributorBoards);
+          }
         }}
       >
         {({loading, error, data}) => {

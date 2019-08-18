@@ -2,9 +2,7 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
-import {Row, Col, Button, ButtonGroup, SplitButton, Dropdown, Form, InputGroup} from 'react-bootstrap';
-// import LoadMainBar from '../containers/LoadMainBar';
-// import LoadMainContent from '../containers/LoadMainContent';
+import {Col, Button, ButtonGroup, Dropdown, Form, InputGroup} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
 
@@ -42,7 +40,16 @@ subscription BoardUpdated($boardId: ID!) {
     updated_by
 }}`;
 
-const fixAccentMark = (string) => string.replace(/\´a/g, 'á').replace(/\´e/g, 'é').replace(/\´i/g, 'í').replace(/\´o/g, 'ó').replace(/\´u/g, 'ú').replace(/\´A/g, 'Á').replace(/\´E/g, 'É').replace(/\´I/g, 'Í').replace(/\´O/g, 'Ó').replace(/\´U/g, 'Ú');
+const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
+    .replace(/\´e/g, 'é')
+    .replace(/\´i/g, 'í')
+    .replace(/\´o/g, 'ó')
+    .replace(/\´u/g, 'ú')
+    .replace(/\´A/g, 'Á')
+    .replace(/\´E/g, 'É')
+    .replace(/\´I/g, 'Í')
+    .replace(/\´O/g, 'Ó')
+    .replace(/\´U/g, 'Ú');
 
 class EditBoard extends Component {
   constructor(props) {
@@ -60,38 +67,11 @@ class EditBoard extends Component {
     this.textAreaInput = React.createRef();
 
     this.moreMutations = false;
-    this.eventID = 1;
-    this.currentEventID = 0;
-
   }
 
   componentDidMount() {
     this.props.setUserAction({userActionName: ACTION_NONE, actionEntityID: this.props.match.params.id});
   }
-
-  // setMoreMutations() {
-  //   if (this.state === undefined || this.state.moreMutations === true) {
-  //     window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
-  //   } else {
-  //     this.setState({moreMutations: true});
-  //   }
-  // }
-
-  // unsetMoreMutations() {
-  //   this.setState({moreMutations: false});
-  // }
-
-  // setMoreMutations() {
-  //   if (this.moreMutations > 0) {
-  //     window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
-  //   } else {
-  //     this.moreMutations += 1;
-  //   }
-  // }
-
-  // unsetMoreMutations() {
-  //   this.moreMutations -= 1;
-  // }
 
   setMoreMutations() {
     if (this.moreMutations === true) {
@@ -106,18 +86,18 @@ class EditBoard extends Component {
   }
 
   // componentDidUpdate(prevProps) {
-  //   console.log('COMPONENTDIDUPDATE TITLE CURRENT VALUE: ', this.titleInput.current.value);
-  //   this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
   // }
 
   handleTextAreaChange(updateBoard, e) {
     const newText = fixAccentMark(e.target.value);
     const cursorStart = e.target.selectionStart;
+
     this.setMoreMutations();
-    // const newText = fixAccentMark(e.target.value);
-    // const cursorStart = e.target.selectionStart;
-    //this.textAreaInput.current.value = newText;
+
+    this.textAreaInput.current.value = newText;
+    this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = cursorStart;
     this.setState({textAreaCursorOffset: cursorStart});
+
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': newText,
@@ -125,20 +105,16 @@ class EditBoard extends Component {
     }}});
   }
 
-  // checkTitleCursorOffset(offset) {
-  //   if (this.state.titleCursorOffset !== offset) {
-  //     window.setTimeout(() => this.checkTitleCursorOffset(offset), 100); /* this checks the flag every 100 milliseconds*/
-  //   }
-  // }
-
   handleTitleChange(updateBoard, e) {
     const newTitle = fixAccentMark(e.target.value);
     const cursorStart = e.target.selectionStart;
+
     this.setMoreMutations();
-    //this.titleInput.current.value = newTitle;
+
+    this.titleInput.current.value = newTitle;
+    this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = cursorStart;
     this.setState({titleCursorOffset: cursorStart});
-    console.log('TITLE SIN ENVIAR: ', newTitle);
-    console.log('TITLE CURSOR OFFSET: ', cursorStart);
+
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': this.props.boardText,
@@ -148,30 +124,28 @@ class EditBoard extends Component {
 
   handleAddContributorClick(addBoardContributor, e) {
     e.preventDefault();
-    console.log('ADDCONTRIBUTOR', this.state.contributorUserName);
-    // AQUI HAY QUE DISPARAR LA MUTATION ADD_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorUserName e BOARD_ID this.props.boardID
+
     addBoardContributor({variables: {data: {
       'type': 'USERNAME',
       'value': this.state.contributorUserName,
       'bid': this.props.boardID,
     }}});
+
     this.setState({contributorUserName: ''});
   }
 
   handleDeleteContributorClick(deleteBoardContributor, e) {
     e.preventDefault();
-    console.log('DELETECONTRIBUTOR', this.state.contributorUserName);
-    // AQUI HAY QUE DISPARAR LA MUTATION DELETE_BOARD_CONTRIBUTOR CON ID DE COLABORADOR === this.state.contributorUserName e BOARD_ID this.props.boardID
+
     deleteBoardContributor({variables: {data: {
       'type': 'USERNAME',
       'value': this.state.contributorUserName,
       'bid': this.props.boardID,
     }}});
+
     this.setState({contributorUserName: ''});
   }
 
-  //   FALTA ACTUALIZAR REDUX STORE
-  //   FALTA EMBEBER MUTACIONES EN SUSCRIPCIÓN.
   render() {
     //   {/* EL IDENTIFICADOR DEL TABLERO DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
@@ -199,15 +173,11 @@ class EditBoard extends Component {
             onSubscriptionData={({subscriptionData}) => {
               const data = subscriptionData.data.boardUpdated;
               if (data.updated_by !== this.props.currentUserID) {
-                console.log('SUSCRIPCIÓN ACEPTADA');
-                console.log('Suscripción realizada con éxito: ', data);
                 this.props.updateBoard(data);
                 this.titleInput.current.value = data.title;
                 this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
                 this.textAreaInput.current.value = data.text;
                 this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
-              } else {
-                console.log('SUSCRIPCIÓN IGNORADA');
               }
             }}>
           </Subscription>
@@ -224,15 +194,7 @@ class EditBoard extends Component {
             </Form.Group>
             <Mutation mutation={UPDATE_BOARD_MUTATION}
               onCompleted={({board}) => {
-                console.log('RECIBIDO TITLE MUTATION Board ID: ', board.id);
-                console.log('RECIBIDO TITLE MUTATION Board Title: ', board.title);
-                console.log('RECIBIDO TITLE MUTATION Board Text: ', board.text);
-                console.log('RECIBIDO TITLE MUTATION Board Updated By: ', board.updated_by);
                 this.props.updateBoard({id: board.id, title: board.title, text: board.text, __typename: 'Board'});
-                this.titleInput.current.value = board.title;
-                this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
-                this.textAreaInput.current.value = board.text;
-                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
                 this.unsetMoreMutations();
               }}>
               {(updateBoard, {data}) => (
@@ -251,21 +213,8 @@ class EditBoard extends Component {
 
           <Mutation mutation={UPDATE_BOARD_MUTATION}
             onCompleted={({board}) => {
-              console.log('RECIBIDO CONTENT MUTATION Board ID: ', board.id);
-              console.log('RECIBIDO CONTENT MUTATION Board Title: ', board.title);
-              console.log('RECIBIDO CONTENT MUTATION Board Text: ', board.text);
-              console.log('RECIBIDO CONTENT MUTATION Board Updated By: ', board.updated_by);
               this.props.updateBoard({id: board.id, title: board.title, text: board.text, __typename: 'Board'});
-              this.titleInput.current.value = board.title;
-              this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
-              this.textAreaInput.current.value = board.text;
-              this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
               this.unsetMoreMutations();
-            // this.props.onLoginClick(login.user.id, login.user.username, login.token);
-            // localStorage.setItem(ACCESS_TOKEN_PARAM, login.token);
-            // console.log('MY TOKEN: ', localStorage.getItem(ACCESS_TOKEN_PARAM));
-            // this.setState({redirectToDashboard: true});
-            // client.writeData({ data: { isLoggedIn: true } });
             }}>
             {(updateBoard, {data}) => (
               <Form.Row>
