@@ -59,7 +59,10 @@ class EditBoard extends Component {
     // Referencia (Ref) al contenido de la pizarra
     this.textAreaInput = React.createRef();
 
-    this.moreMutations = 0;
+    this.moreMutations = false;
+    this.eventID = 1;
+    this.currentEventID = 0;
+
   }
 
   componentDidMount() {
@@ -78,16 +81,28 @@ class EditBoard extends Component {
   //   this.setState({moreMutations: false});
   // }
 
+  // setMoreMutations() {
+  //   if (this.moreMutations > 0) {
+  //     window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
+  //   } else {
+  //     this.moreMutations += 1;
+  //   }
+  // }
+
+  // unsetMoreMutations() {
+  //   this.moreMutations -= 1;
+  // }
+
   setMoreMutations() {
-    if (this.moreMutations > 0) {
-      window.setTimeout(this.setMoreMutations, 100); /* this checks the flag every 50 milliseconds*/
+    if (this.moreMutations === true) {
+      window.setTimeout(this.setMoreMutations, 50); /* this checks the flag every 50 milliseconds*/
     } else {
-      this.moreMutations += 1;
+      this.moreMutations = true;
     }
   }
 
   unsetMoreMutations() {
-    this.moreMutations -= 1;
+    this.moreMutations = false;
   }
 
   // componentDidUpdate(prevProps) {
@@ -96,32 +111,39 @@ class EditBoard extends Component {
   // }
 
   handleTextAreaChange(updateBoard, e) {
-    this.setMoreMutations();
     const newText = fixAccentMark(e.target.value);
+    const cursorStart = e.target.selectionStart;
+    this.setMoreMutations();
+    // const newText = fixAccentMark(e.target.value);
+    // const cursorStart = e.target.selectionStart;
+    //this.textAreaInput.current.value = newText;
+    this.setState({textAreaCursorOffset: cursorStart});
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': newText,
       'title': this.props.boardTitle,
     }}});
-    const cursorStart = e.target.selectionStart;
-    this.textAreaInput.current.value = newText;
-    this.setState({textAreaCursorOffset: cursorStart});
   }
 
+  // checkTitleCursorOffset(offset) {
+  //   if (this.state.titleCursorOffset !== offset) {
+  //     window.setTimeout(() => this.checkTitleCursorOffset(offset), 100); /* this checks the flag every 100 milliseconds*/
+  //   }
+  // }
+
   handleTitleChange(updateBoard, e) {
-    this.setMoreMutations();
     const newTitle = fixAccentMark(e.target.value);
+    const cursorStart = e.target.selectionStart;
+    this.setMoreMutations();
+    //this.titleInput.current.value = newTitle;
+    this.setState({titleCursorOffset: cursorStart});
     console.log('TITLE SIN ENVIAR: ', newTitle);
+    console.log('TITLE CURSOR OFFSET: ', cursorStart);
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
       'text': this.props.boardText,
       'title': newTitle,
     }}});
-
-    const cursorStart = e.target.selectionStart;
-    //this.titleInput.current.value = newTitle;
-    console.log('TITLE CURSOR OFFSET: ', cursorStart);
-    this.setState({titleCursorOffset: cursorStart});
   }
 
   handleAddContributorClick(addBoardContributor, e) {
