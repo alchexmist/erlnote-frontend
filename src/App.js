@@ -13,7 +13,7 @@ import Login from './Login';
 import RunLogin from './containers/RunLogin';
 import AppFooter from './components/AppFooter';
 import SignUp from './components/SignUp';
-import MainContainer from './components/MainContainer';
+import LoadMainContainer from './containers/LoadMainContainer';
 import AppHeaderContainer from './containers/AppHeaderContainer';
 import LoadEditBoard from './containers/LoadEditBoard';
 import {ACCESS_TOKEN_PARAM} from './graphql-client';
@@ -59,7 +59,7 @@ function App() {
         {/* <Route path="/edit/board/:id" exact component={LoadEditBoard} /> */}
         {/* <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} /> */}
         <Route exact path="/" render={() => (existToken() ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
-        <Route exact path="/dashboard" render={() => (existToken() ? (<MainContainer />) : (<RunLogin />))}/>
+        <Route exact path="/dashboard" render={() => (existToken() ? (<LoadMainContainer />) : (<RunLogin />))}/>
         <Route exact path="/edit/board/:id" render={() => (existToken() ? (<LoadEditBoard />) : (<RunLogin />))}/>
         <Route exact path="/signup" component={SignUp} />
         {/* when none of the above match, <BadRoute> will be rendered */}

@@ -3,7 +3,10 @@ import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
 import {Row} from 'react-bootstrap';
 import LoadMainBar from '../containers/LoadMainBar';
-import LoadMainContent from '../containers/LoadMainContent';
+import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
+import LoadBoards from '../containers/LoadBoards';
+import LoadTasklists from '../containers/LoadTasklists';
+import LoadNotes from '../containers/LoadNotes';
 
 class MainContainer extends Component {
   constructor(props) {
@@ -21,7 +24,15 @@ class MainContainer extends Component {
           <LoadMainBar />
         </Row>
         <Row className="ml-0 mr-0">
-          <LoadMainContent />
+          { this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES &&
+          <LoadNotes />
+          }
+          { this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS &&
+          <LoadBoards />
+          }
+          { this.props.entityVisible === ENTITY_VISIBLE_ID_TASKLISTS &&
+          <LoadTasklists />
+          }
         </Row>
       </Container>
     );

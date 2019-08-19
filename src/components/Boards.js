@@ -47,41 +47,45 @@ class Boards extends Component {
     }
 
     return (
-      <Query query={GET_BOARDS}
-        fetchPolicy={'cache-and-network'}
-        onCompleted={({me}) => {
-          if (!(me.ownerBoards.every((e) => this.props.boards.includes(e)))) {
-            console.log('OWNER BOARDS RECEIVED: ', me.ownerBoards);
-            console.log('OWNER BOARDS STATE: ', this.props.boards);
-            this.props.boardListRequest(me.ownerBoards);
-          }
-          if (!(me.contributorBoards.every((e) => this.props.boards.includes(e)))) {
-            console.log('CONTRIBUTOR BOARDS RECEIVED: ', me.contributorBoards);
-            console.log('CONTRIBUTOR BOARDS STATE: ', this.props.boards);
-            this.props.boardListRequest(me.contributorBoards);
-          }
-        }}
-      >
-        {({loading, error, data}) => {
-          if (loading) return 'Loading...';
-          if (error) return `Error! ${error.message}`;
-
-          // eslint-disable-next-line react/display-name
-          const parseBoardData = (boardData) =>
-            <Card as="a" key={boardData.id} onClick={(e) => this.handleBoardCardClick(boardData.id, e)} style={{cursor: 'pointer'}}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>;
-
-          return (
-            <ul>
-              {
-                data.me.ownerBoards.map(parseBoardData)
+      <Container className="mx-auto my-3">
+        <CardColumns>
+          <Query query={GET_BOARDS}
+            fetchPolicy={'cache-and-network'}
+            onCompleted={({me}) => {
+              if (!(me.ownerBoards.every((e) => this.props.boards.includes(e)))) {
+                console.log('OWNER BOARDS RECEIVED: ', me.ownerBoards);
+                console.log('OWNER BOARDS STATE: ', this.props.boards);
+                this.props.boardListRequest(me.ownerBoards);
               }
-              {
-                data.me.contributorBoards.map(parseBoardData)
+              if (!(me.contributorBoards.every((e) => this.props.boards.includes(e)))) {
+                console.log('CONTRIBUTOR BOARDS RECEIVED: ', me.contributorBoards);
+                console.log('CONTRIBUTOR BOARDS STATE: ', this.props.boards);
+                this.props.boardListRequest(me.contributorBoards);
               }
-            </ul>
-          );
-        }}
-      </Query>
+            }}
+          >
+            {({loading, error, data}) => {
+              if (loading) return 'Loading...';
+              if (error) return `Error! ${error.message}`;
+
+              // eslint-disable-next-line react/display-name
+              const parseBoardData = (boardData) =>
+                <Card as="a" key={boardData.id} onClick={(e) => this.handleBoardCardClick(boardData.id, e)} style={{cursor: 'pointer'}}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>;
+
+              return (
+                <ul>
+                  {
+                    data.me.ownerBoards.map(parseBoardData)
+                  }
+                  {
+                    data.me.contributorBoards.map(parseBoardData)
+                  }
+                </ul>
+              );
+            }}
+          </Query>
+        </CardColumns>
+      </Container>
     );
   }
 }

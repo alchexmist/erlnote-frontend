@@ -49,33 +49,37 @@ class Tasklists extends Component {
 
   render() {
     return (
-      <Query query={GET_TASKLISTS}
-        fetchPolicy={'cache-and-network'}
-        onCompleted={({me}) => {
-          this.props.tasklistListRequest(me.ownerTasklists);
-          this.props.tasklistListRequest(me.contributorTasklists);
-        }}
-      >
-        {({loading, error, data}) => {
-          if (loading) return 'Loading...';
-          if (error) return `Error! ${error.message}`;
+      <Container className="mx-auto my-3">
+        <CardColumns>
+          <Query query={GET_TASKLISTS}
+            fetchPolicy={'cache-and-network'}
+            onCompleted={({me}) => {
+              this.props.tasklistListRequest(me.ownerTasklists);
+              this.props.tasklistListRequest(me.contributorTasklists);
+            }}
+          >
+            {({loading, error, data}) => {
+              if (loading) return 'Loading...';
+              if (error) return `Error! ${error.message}`;
 
-          // eslint-disable-next-line react/display-name
-          const parseTasklistData = (tasklistData) =>
-            <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>;
+              // eslint-disable-next-line react/display-name
+              const parseTasklistData = (tasklistData) =>
+                <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>;
 
-          return (
-            <ul>
-              {
-                data.me.ownerTasklists.map(parseTasklistData)
-              }
-              {
-                data.me.contributorTasklists.map(parseTasklistData)
-              }
-            </ul>
-          );
-        }}
-      </Query>
+              return (
+                <ul>
+                  {
+                    data.me.ownerTasklists.map(parseTasklistData)
+                  }
+                  {
+                    data.me.contributorTasklists.map(parseTasklistData)
+                  }
+                </ul>
+              );
+            }}
+          </Query>
+        </CardColumns>
+      </Container>
     );
   }
 }
