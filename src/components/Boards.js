@@ -49,7 +49,6 @@ class Boards extends Component {
     return (
       <Query query={GET_BOARDS}
         fetchPolicy={'cache-and-network'}
-        pollInterval={5000}
         onCompleted={({me}) => {
           if (!(me.ownerBoards.every((e) => this.props.boards.includes(e)))) {
             console.log('OWNER BOARDS RECEIVED: ', me.ownerBoards);

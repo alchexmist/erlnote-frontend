@@ -75,7 +75,6 @@ const GET_TASKLISTS = gql`
 const Notes = ({noteListRequest}) => (
   <Query query={GET_NOTES}
     fetchPolicy={'cache-and-network'}
-    pollInterval={5000}
     onCompleted={({me}) => {
       console.log('Ala venga chao:', me);
       noteListRequest(me.ownerNotes);
@@ -144,7 +143,6 @@ const Notes = ({noteListRequest}) => (
 const Tasklists = ({tasklistListRequest}) => (
   <Query query={GET_TASKLISTS}
     fetchPolicy={'cache-and-network'}
-    pollInterval={5000}
     onCompleted={({me}) => {
       tasklistListRequest(me.ownerTasklists);
       tasklistListRequest(me.contributorTasklists);
