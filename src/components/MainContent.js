@@ -3,6 +3,7 @@
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Form, FormControl, Button, Container, Row, Col, CardColumns, Card} from 'react-bootstrap';
 import LoadBoards from '../containers/LoadBoards';
+import LoadTasklists from '../containers/LoadTasklists';
 import gql from 'graphql-tag';
 import {Query} from 'react-apollo';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
@@ -41,36 +42,36 @@ const GET_NOTES = gql`
 //   }
 // `;
 
-const GET_TASKLISTS = gql`
-  {
-      me {
-        ownerTasklists {
-          id
-          title
-          tasks {
-            id
-            name
-            description
-            state
-            startDatetime
-            endDatetime
-          }
-        }
-        contributorTasklists {
-          id
-          title
-          tasks {
-            id
-            name
-            description
-            state
-            startDatetime
-            endDatetime
-          }
-        }
-      } 
-  }
-`;
+// const GET_TASKLISTS = gql`
+//   {
+//       me {
+//         ownerTasklists {
+//           id
+//           title
+//           tasks {
+//             id
+//             name
+//             description
+//             state
+//             startDatetime
+//             endDatetime
+//           }
+//         }
+//         contributorTasklists {
+//           id
+//           title
+//           tasks {
+//             id
+//             name
+//             description
+//             state
+//             startDatetime
+//             endDatetime
+//           }
+//         }
+//       } 
+//   }
+// `;
 
 const Notes = ({noteListRequest}) => (
   <Query query={GET_NOTES}
@@ -140,36 +141,36 @@ const Notes = ({noteListRequest}) => (
 //   </Query>
 // );
 
-const Tasklists = ({tasklistListRequest}) => (
-  <Query query={GET_TASKLISTS}
-    fetchPolicy={'cache-and-network'}
-    onCompleted={({me}) => {
-      tasklistListRequest(me.ownerTasklists);
-      tasklistListRequest(me.contributorTasklists);
-    // client.writeData({ data: { isLoggedIn: true } });
-    }}
-  >
-    {({loading, error, data}) => {
-      if (loading) return 'Loading...';
-      if (error) return `Error! ${error.message}`;
+// const Tasklists = ({tasklistListRequest}) => (
+//   <Query query={GET_TASKLISTS}
+//     fetchPolicy={'cache-and-network'}
+//     onCompleted={({me}) => {
+//       tasklistListRequest(me.ownerTasklists);
+//       tasklistListRequest(me.contributorTasklists);
+//     // client.writeData({ data: { isLoggedIn: true } });
+//     }}
+//   >
+//     {({loading, error, data}) => {
+//       if (loading) return 'Loading...';
+//       if (error) return `Error! ${error.message}`;
 
-      // eslint-disable-next-line react/display-name
-      const parseTasklistData = (tasklistData) =>
-        <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>;
+//       // eslint-disable-next-line react/display-name
+//       const parseTasklistData = (tasklistData) =>
+//         <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>;
 
-      return (
-        <ul>
-          {
-            data.me.ownerTasklists.map(parseTasklistData)
-          }
-          {
-            data.me.contributorTasklists.map(parseTasklistData)
-          }
-        </ul>
-      );
-    }}
-  </Query>
-);
+//       return (
+//         <ul>
+//           {
+//             data.me.ownerTasklists.map(parseTasklistData)
+//           }
+//           {
+//             data.me.contributorTasklists.map(parseTasklistData)
+//           }
+//         </ul>
+//       );
+//     }}
+//   </Query>
+// );
 
 export default class MainContent extends Component {
   constructor(props) {
@@ -195,7 +196,7 @@ export default class MainContent extends Component {
           <LoadBoards />
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_TASKLISTS &&
-          <Tasklists tasklistListRequest={this.props.tasklistListRequest}/>
+          <LoadTasklists />
           }
         </CardColumns>
         {/* <CardColumns>
