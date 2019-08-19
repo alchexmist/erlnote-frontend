@@ -24,7 +24,21 @@ class MainContainer extends Component {
           <LoadMainBar />
         </Row>
         <Row className="ml-0 mr-0">
-          { this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES &&
+          {(() => {
+            switch (this.props.entityVisible) {
+              case ENTITY_VISIBLE_ID_NOTES:
+                return <LoadNotes />;
+              case ENTITY_VISIBLE_ID_BOARDS:
+                return <LoadBoards />;
+              case ENTITY_VISIBLE_ID_TASKLISTS:
+                return <LoadTasklists />;
+              default:
+                return null;
+            }
+          })()}
+
+
+          {/* { this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES &&
           <LoadNotes />
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS &&
@@ -32,7 +46,7 @@ class MainContainer extends Component {
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_TASKLISTS &&
           <LoadTasklists />
-          }
+          } */}
         </Row>
       </Container>
     );
