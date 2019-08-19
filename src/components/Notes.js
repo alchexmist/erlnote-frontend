@@ -37,44 +37,40 @@ class Notes extends Component {
   //   <Notes />;
   // }
 
+  parseNoteData(noteData) {
+    return (
+      <Card key={noteData.id}><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>
+    );
+  }
+
   render() {
     return (
       <Container className="mx-auto my-3">
-        <CardColumns>
-          <Query query={GET_NOTES}
-            fetchPolicy={'cache-and-network'}
-            onCompleted={({me}) => {
+        <Query query={GET_NOTES}
+          fetchPolicy={'cache-and-network'}
+          pollInterval={5000}
+          onCompleted={({me}) => {
+            if (!(me.ownerNotes.every((e) => this.props.notes.includes(e)))) {
               this.props.noteListRequest(me.ownerNotes);
+            }
+            if (!(me.contributorNotes.every((e) => this.props.notes.includes(e)))) {
               this.props.noteListRequest(me.contributorNotes);
-            }}
-          >
-            {({loading, error, data}) => {
-              if (loading) return 'Loading...';
-              if (error) return `Error! ${error.message}`;
+            }
+          }}
+        >
+          {({loading, error, data}) => {
+            if (loading) return null;
+            if (error) return null;
 
-              // eslint-disable-next-line react/display-name
-              const parseNoteData = (noteData) =>
-                <Card key={noteData.id}><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>;
-
-              return (
-                <ul>
-                  {
-                    data.me.ownerNotes.map(parseNoteData)
-                  }
-                  {
-                    data.me.contributorNotes.map(parseNoteData)
-                  }
-                </ul>
-              // <select name="dog" onChange={onDogSelected}>
-              //   {data.dogs.map(dog => (
-              //     <option key={dog.id} value={dog.breed}>
-              //       {dog.breed}
-              //     </option>
-              //   ))}
-              // </select>
-              );
-            }}
-          </Query>
+            return null;
+          }}
+        </Query>
+        <CardColumns>
+          <ul>
+            {
+              this.props.notes.map((e) => this.parseNoteData(e))
+            }
+          </ul>
         </CardColumns>
       </Container>
     );

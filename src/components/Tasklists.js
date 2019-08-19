@@ -47,37 +47,40 @@ class Tasklists extends Component {
     // };
   }
 
+  parseTasklistData(tasklistData) {
+    return (
+      <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>
+    );
+  }
+
   render() {
     return (
       <Container className="mx-auto my-3">
-        <CardColumns>
-          <Query query={GET_TASKLISTS}
-            fetchPolicy={'cache-and-network'}
-            onCompleted={({me}) => {
+        <Query query={GET_TASKLISTS}
+          fetchPolicy={'cache-and-network'}
+          pollInterval={5000}
+          onCompleted={({me}) => {
+            if (!(me.ownerTasklists.every((e) => this.props.tasklists.includes(e)))) {
               this.props.tasklistListRequest(me.ownerTasklists);
+            }
+            if (!(me.contributorTasklists.every((e) => this.props.tasklists.includes(e)))) {
               this.props.tasklistListRequest(me.contributorTasklists);
-            }}
-          >
-            {({loading, error, data}) => {
-              if (loading) return 'Loading...';
-              if (error) return `Error! ${error.message}`;
+            }
+          }}
+        >
+          {({loading, error, data}) => {
+            if (loading) return null;
+            if (error) return null;
 
-              // eslint-disable-next-line react/display-name
-              const parseTasklistData = (tasklistData) =>
-                <Card key={tasklistData.id}><Card.Body><Card.Title>{tasklistData.title}</Card.Title></Card.Body></Card>;
-
-              return (
-                <ul>
-                  {
-                    data.me.ownerTasklists.map(parseTasklistData)
-                  }
-                  {
-                    data.me.contributorTasklists.map(parseTasklistData)
-                  }
-                </ul>
-              );
-            }}
-          </Query>
+            return null;
+          }}
+        </Query>
+        <CardColumns>
+          <ul>
+            {
+              this.props.tasklists.map((e) => this.parseTasklistData(e))
+            }
+          </ul>
         </CardColumns>
       </Container>
     );
