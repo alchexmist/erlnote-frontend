@@ -4,26 +4,27 @@ import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Form, FormControl, Button, Container, Row, Col, CardColumns, Card} from 'react-bootstrap';
 import LoadBoards from '../containers/LoadBoards';
 import LoadTasklists from '../containers/LoadTasklists';
+import Notes from '../containers/LoadNotes';
 import gql from 'graphql-tag';
 import {Query} from 'react-apollo';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
 
-const GET_NOTES = gql`
-  {
-      me {
-        ownerNotes {
-          id
-          title
-          body
-        }
-        contributorNotes {
-          id
-          title
-          body
-        }
-      } 
-  }
-`;
+// const GET_NOTES = gql`
+//   {
+//       me {
+//         ownerNotes {
+//           id
+//           title
+//           body
+//         }
+//         contributorNotes {
+//           id
+//           title
+//           body
+//         }
+//       } 
+//   }
+// `;
 
 // const GET_BOARDS = gql`
 //   {
@@ -73,44 +74,44 @@ const GET_NOTES = gql`
 //   }
 // `;
 
-const Notes = ({noteListRequest}) => (
-  <Query query={GET_NOTES}
-    fetchPolicy={'cache-and-network'}
-    onCompleted={({me}) => {
-      console.log('Ala venga chao:', me);
-      noteListRequest(me.ownerNotes);
-      noteListRequest(me.contributorNotes);
-    // client.writeData({ data: { isLoggedIn: true } });
-    }}
-  >
-    {({loading, error, data}) => {
-      if (loading) return 'Loading...';
-      if (error) return `Error! ${error.message}`;
+// const Notes = ({noteListRequest}) => (
+//   <Query query={GET_NOTES}
+//     fetchPolicy={'cache-and-network'}
+//     onCompleted={({me}) => {
+//       console.log('Ala venga chao:', me);
+//       noteListRequest(me.ownerNotes);
+//       noteListRequest(me.contributorNotes);
+//     // client.writeData({ data: { isLoggedIn: true } });
+//     }}
+//   >
+//     {({loading, error, data}) => {
+//       if (loading) return 'Loading...';
+//       if (error) return `Error! ${error.message}`;
 
-      // eslint-disable-next-line react/display-name
-      const parseNoteData = (noteData) =>
-        <Card key={noteData.id}><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>;
+//       // eslint-disable-next-line react/display-name
+//       const parseNoteData = (noteData) =>
+//         <Card key={noteData.id}><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>;
 
-      return (
-        <ul>
-          {
-            data.me.ownerNotes.map(parseNoteData)
-          }
-          {
-            data.me.contributorNotes.map(parseNoteData)
-          }
-        </ul>
-      // <select name="dog" onChange={onDogSelected}>
-      //   {data.dogs.map(dog => (
-      //     <option key={dog.id} value={dog.breed}>
-      //       {dog.breed}
-      //     </option>
-      //   ))}
-      // </select>
-      );
-    }}
-  </Query>
-);
+//       return (
+//         <ul>
+//           {
+//             data.me.ownerNotes.map(parseNoteData)
+//           }
+//           {
+//             data.me.contributorNotes.map(parseNoteData)
+//           }
+//         </ul>
+//       // <select name="dog" onChange={onDogSelected}>
+//       //   {data.dogs.map(dog => (
+//       //     <option key={dog.id} value={dog.breed}>
+//       //       {dog.breed}
+//       //     </option>
+//       //   ))}
+//       // </select>
+//       );
+//     }}
+//   </Query>
+// );
 
 // const Boards = ({boardListRequest}) => (
 //   <Query query={GET_BOARDS}
@@ -190,7 +191,7 @@ export default class MainContent extends Component {
       <Container className="mx-auto my-3">
         <CardColumns>
           { this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES &&
-          <Notes noteListRequest={this.props.noteListRequest}/>
+          <Notes />
           }
           { this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS &&
           <LoadBoards />
