@@ -18,6 +18,7 @@ import AppHeaderContainer from './containers/AppHeaderContainer';
 import LoadEditBoard from './containers/LoadEditBoard';
 import {ACCESS_TOKEN_PARAM} from './graphql-client';
 import {withRouter} from 'react-router-dom';
+import LoadEditTasklist from './containers/LoadEditTasklist';
 
 // import EditBoard from './components/EditBoard';
 
@@ -61,6 +62,7 @@ function App() {
         <Route exact path="/" render={() => (existToken() ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
         <Route exact path="/dashboard" render={() => (existToken() ? (<LoadMainContainer />) : (<RunLogin />))}/>
         <Route exact path="/edit/board/:id" render={() => (existToken() ? (<LoadEditBoard />) : (<RunLogin />))}/>
+        <Route exact path="/edit/tasklist/:id" render={() => (existToken() ? (<LoadEditTasklist />) : (<RunLogin />))}/>
         <Route exact path="/signup" component={SignUp} />
         {/* when none of the above match, <BadRoute> will be rendered */}
         <Route render={(props) => <Page404 {...props} info="INSERT COIN..." />} />

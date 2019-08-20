@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION} from '../constants/action-types';
 
 
 export function logout() {
@@ -41,5 +41,9 @@ export function setUserAction(userAction) {
 
 export function addNewBoard(boardData) {
   return {type: ADD_NEW_BOARD, id: boardData.boardID, title: boardData.boardTitle, text: boardData.boardText, __typename: 'Board'};
+}
+
+export function addNewTasklist(tasklistData) {
+  return {type: ADD_NEW_TASKLIST, id: tasklistData.tasklistID, title: tasklistData.tasklistTitle, tasks: tasklistData.tasklistTasks, tags: tasklistData.tasklistTags, __typename: 'Tasklist'};
 }
 

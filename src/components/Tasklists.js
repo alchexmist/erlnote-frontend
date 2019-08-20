@@ -18,8 +18,13 @@ const GET_TASKLISTS = gql`
             name
             description
             state
+            priority
             startDatetime
             endDatetime
+          }
+          tags {
+            id
+            name
           }
         }
         contributorTasklists {
@@ -29,9 +34,14 @@ const GET_TASKLISTS = gql`
             id
             name
             description
+            priority
             state
             startDatetime
             endDatetime
+          }
+          tags {
+            id
+            name
           }
         }
       } 

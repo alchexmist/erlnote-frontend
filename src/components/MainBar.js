@@ -4,7 +4,7 @@
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Button, Container} from 'react-bootstrap';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
-import {ACTION_CREATE_BOARD} from '../redux/constants/action-types';
+import {ACTION_CREATE_BOARD, ACTION_CREATE_TASKLIST} from '../redux/constants/action-types';
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import gql from 'graphql-tag';
 import {Mutation} from 'react-apollo';
@@ -17,6 +17,14 @@ const CREATE_BOARD_MUTATION = gql`
         text
       }
     }`;
+
+const CREATE_TASKLIST_MUTATION = gql`
+mutation CreateTasklist {
+  tasklist: createTasklist {
+    id
+    title
+  }
+}`;
 
 export default class MainBar extends Component {
   constructor(props) {
@@ -38,11 +46,18 @@ export default class MainBar extends Component {
     this.props.setUserAction({userActionName: userActionName, actionEntityID: boardData.boardID});
   }
 
+  handleCreateTasklistClick(userActionName, tasklistData) {
+    this.props.addNewTasklist(tasklistData);
+    this.props.setUserAction({userActionName: userActionName, actionEntityID: tasklistData.tasklistID});
+  }
+
   render() {
     if (this.props.userAction === ACTION_CREATE_BOARD) {
       return <Redirect to={'/edit/board/' + this.props.userActionEntityID} />;
     }
-
+    if (this.props.userAction === ACTION_CREATE_TASKLIST) {
+      return <Redirect to={'/edit/tasklist/' + this.props.userActionEntityID} />;
+    }
     return (
       <Container className="p-0" fluid="true">
         <Navbar variant="dark" bg="dark" expand="xl" >
@@ -59,7 +74,18 @@ export default class MainBar extends Component {
                 {this.props.entityVisible != ENTITY_VISIBLE_ID_BOARDS && <NavDropdown.Item eventKey={ENTITY_VISIBLE_ID_BOARDS} onSelect={(eventKey, event) => this.entityDropDownOnSelect(eventKey, event)}>Pizarras</NavDropdown.Item>}
               </NavDropdown>
             </Nav>
-            {this.props.entityVisible == ENTITY_VISIBLE_ID_TASKLISTS &&<Button variant="outline-info">Crear lista de tareas</Button>}
+            {this.props.entityVisible == ENTITY_VISIBLE_ID_TASKLISTS &&
+            <Mutation mutation={CREATE_TASKLIST_MUTATION}
+              onCompleted={({tasklist}) => {
+                console.log('Tasklist ID: ', tasklist.id);
+                console.log('Tasklist Title: ', tasklist.title);
+                this.handleCreateTasklistClick(ACTION_CREATE_TASKLIST, {tasklistID: tasklist.id, tasklistTitle: tasklist.title, tasklistTasks: [], tasklistTags: []});
+              }}>
+              {(createTasklist, {data}) => (
+                <Button variant="outline-info" onClick={() => createTasklist()}>Crear lista de tareas</Button>
+              )}
+            </Mutation>
+            }
             {this.props.entityVisible == ENTITY_VISIBLE_ID_NOTES &&<Button variant="outline-info">Crear nota</Button>}
             {/* {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&<Button variant="outline-info" onClick={() => this.handleCreateBoardClick(ACTION_CREATE_BOARD)} >Crear pizarra</Button>} */}
             {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&

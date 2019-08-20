@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import MainBar from '../components/MainBar';
-import {updateEntityVisible, setUserAction, addNewBoard} from '../redux/actions/index';
+import {updateEntityVisible, setUserAction, addNewBoard, addNewTasklist} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -21,6 +21,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     addNewBoard: (boardData) => {
       dispatch(addNewBoard(boardData));
+    },
+    addNewTasklist: (tasklistData) => {
+      dispatch(addNewTasklist(tasklistData));
     },
   };
 };
