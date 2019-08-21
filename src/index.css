@@ -26,3 +26,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+#tasklist-listgroup > .list-group-item > .input-group > .input-group-prepend > .input-group-text {
+  border: 0 none;
+  background-color: transparent;
+}
