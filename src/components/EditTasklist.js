@@ -9,6 +9,26 @@ import {ACTION_NONE} from '../redux/constants/action-types';
 import gql from 'graphql-tag';
 import {Mutation, Subscription} from 'react-apollo';
 
+const UPDATE_TASKLIST_MUTATION = gql`
+  mutation UpdateTasklist($tasklistData: UpdateTasklistInput!) {
+    tasklist: updateTasklist(input: $tasklistData) {
+      id
+      title
+      tasks {
+          id
+          name
+          description
+          state
+          priority
+          startDatetime
+          endDatetime
+      }
+      tags {
+          id
+          name
+      }
+    }
+  }`;
 
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
@@ -26,33 +46,88 @@ class EditTasklist extends Component {
     super(props);
 
     this.state = {
-
+      titleCursorOffset: 0,
     };
+
+    // Referencia (Ref) a entrada de título
+    this.tasklistTitleInput = React.createRef();
+
+    this.moreMutations = false;
   }
 
   componentDidMount() {
     this.props.setUserAction({userActionName: ACTION_NONE, actionEntityID: this.props.match.params.id});
+    this.tasklistTitleInput.current.focus();
+  }
+
+  setMoreMutations() {
+    if (this.moreMutations === true) {
+      window.setTimeout(this.setMoreMutations, 50); /* this checks the flag every 50 milliseconds*/
+    } else {
+      this.moreMutations = true;
+    }
+  }
+
+  unsetMoreMutations() {
+    this.moreMutations = false;
+  }
+
+  handleTitleChange(updateTasklist, e) {
+    let newTitle;
+    let withTitle = true;
+
+    if (e.target.value.length > 0) {
+      newTitle = fixAccentMark(e.target.value);
+    } else {
+      newTitle = '<Sin título>';
+      withTitle = false;
+    }
+    // const newTitle = fixAccentMark(e.target.value);
+    const cursorStart = e.target.selectionStart;
+
+    this.setMoreMutations();
+
+    this.tasklistTitleInput.current.value = newTitle;
+    if (withTitle) {
+      this.tasklistTitleInput.current.selectionStart = this.tasklistTitleInput.current.selectionEnd = cursorStart;
+    } else {
+      this.tasklistTitleInput.current.selectionStart = cursorStart;
+      this.tasklistTitleInput.current.selectionEnd = newTitle.length;
+    }
+    this.setState({titleCursorOffset: cursorStart});
+
+    updateTasklist({variables: {tasklistData: {
+      'tasklistId': this.props.tasklistID,
+      'title': newTitle,
+    }}});
   }
 
   render() {
-    //   {/* EL IDENTIFICADOR DEL TABLERO DE LA URL */}
+    //   {/* EL IDENTIFICADOR DE LA LISTA DE TAREAS DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
     return (
       <Container className="my-3">
         <Form>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text>Título</InputGroup.Text>
-            </InputGroup.Prepend>
-            <Form.Control size="lg" type="text" placeholder="Título de la lista de tareas" />
-          </InputGroup>
-
+          <Mutation mutation={UPDATE_TASKLIST_MUTATION}
+            onCompleted={({tasklist}) => {
+              this.props.updateTasklist({id: tasklist.id, title: tasklist.title, tasks: tasklist.tasks, tags: tasklist.tags, __typename: 'Tasklist'});
+              this.unsetMoreMutations();
+            }}>
+            {(updateTasklist, {data}) => (
+              <InputGroup>
+                <InputGroup.Prepend>
+                  <InputGroup.Text>Título</InputGroup.Text>
+                </InputGroup.Prepend>
+                <Form.Control ref={this.tasklistTitleInput} size="lg" type="text" placeholder="Título de la lista de tareas" defaultValue={(this.props.tasklistTitle !== null) ? this.props.tasklistTitle : ''} onChange={(e) => this.handleTitleChange(updateTasklist, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
+              </InputGroup>
+            )}
+          </Mutation>
           <Tabs id="uncontrolled-tab-tasklist-actions" className="mt-5 mb-3" variant="pills">
             <Tab eventKey="tasklist-new-task" title="Nueva Tarea">
               <Form.Control type="text" className="mb-5" placeholder="Nombre de la tarea nueva a crear" />
             </Tab>
             <Tab eventKey="tasklist-contributors" title="Colaboradores">
-              <Form className="mb-5">
+              <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
                     <Form.Control placeholder="Nombre de usuario" />
@@ -88,10 +163,10 @@ class EditTasklist extends Component {
                     </Dropdown>
                   </Col>
                 </Row>
-              </Form>
+              </Container>
             </Tab>
             <Tab eventKey="contact" title="Etiquetas">
-              <Form className="mb-5">
+              <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
                     <Form.Control placeholder="Nombre de la etiqueta" />
@@ -110,10 +185,10 @@ class EditTasklist extends Component {
                     </Dropdown>
                   </Col>
                 </Row>
-              </Form>
+              </Container>
             </Tab>
           </Tabs>
-          
+
           <ListGroup id="tasklist-listgroup" style={{'maxHeight': 300, 'overflowY': 'auto'}}>
             <ListGroup.Item as="div" variant="dark">
               <Form.Group as={Row} controlId="formPlaintextEmail">

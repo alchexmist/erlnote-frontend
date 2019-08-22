@@ -1,11 +1,12 @@
 import {connect} from 'react-redux';
 import Tasklists from '../components/Tasklists';
-import {updateTasklists} from '../redux/actions/index';
+import {setUserAction, updateTasklists} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
   return {
-    entityVisible: state.entityVisible,
+    userAction: state.userAction,
+    userActionEntityID: state.userActionEntityID,
     tasklists: state.tasklists,
   };
 };
@@ -14,6 +15,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     tasklistListRequest: (tasklistList) => {
       dispatch(updateTasklists(tasklistList));
+    },
+    setUserAction: (userAction) => {
+      dispatch(setUserAction(userAction));
     },
   };
 };

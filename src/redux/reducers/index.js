@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -84,6 +84,14 @@ function rootReducer(state = initialState, action) {
           {
             // boards: action.boardList,
             boards: [...action.boardList, ...updatedBoards],
+          }
+      );
+    case UPDATE_TASKLIST:
+      return Object.assign(
+          {},
+          state,
+          {
+            tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
           }
       );
     case UPDATE_TASKLISTS:

@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST} from '../constants/action-types';
 
 
 export function logout() {
@@ -25,6 +25,10 @@ export function updateBoard(boardDataObject) {
 
 export function updateBoards(boardList) {
   return {type: UPDATE_BOARDS, boardList: boardList};
+};
+
+export function updateTasklist(tasklistDataObject) {
+  return {type: UPDATE_TASKLIST, tasklistDataObject: tasklistDataObject};
 };
 
 export function updateTasklists(tasklistList) {

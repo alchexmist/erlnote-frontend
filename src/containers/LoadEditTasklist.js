@@ -1,16 +1,16 @@
 /* eslint-disable max-len */
 import {connect} from 'react-redux';
 import EditTasklist from '../components/EditTasklist';
-import {setUserAction, updateBoard} from '../redux/actions/index';
+import {setUserAction, updateTasklist} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
-//   const boardData = state.boards.find((e) => e.id === state.userActionEntityID);
+  const tasklistData = state.tasklists.find((e) => e.id === state.userActionEntityID);
 
   return {
     currentUserID: state.account.userID,
-    // boardID: (boardData != undefined && boardData != null) ? boardData.id : state.userActionEntityID,
-    // boardTitle: (boardData != undefined && boardData != null) ? boardData.title : '',
+    tasklistID: (tasklistData != undefined && tasklistData != null) ? tasklistData.id : state.userActionEntityID,
+    tasklistTitle: (tasklistData != undefined && tasklistData != null) ? tasklistData.title : '',
     // boardText: (boardData != undefined && boardData != null) ? boardData.text : '',
     userAction: state.userAction,
     userActionEntityID: state.userActionEntityID,
@@ -22,9 +22,9 @@ const mapDispatchToProps = (dispatch) => {
     setUserAction: (userAction) => {
       dispatch(setUserAction(userAction));
     },
-    // updateBoard: (boardDataObject) => {
-    //   dispatch(updateBoard(boardDataObject));
-    // },
+    updateTasklist: (tasklistDataObject) => {
+      dispatch(updateTasklist(tasklistDataObject));
+    },
   };
 };
 
