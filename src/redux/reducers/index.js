@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -63,6 +63,15 @@ function rootReducer(state = initialState, action) {
             tasklists: [...state.tasklists.slice(), {id: action.id, title: action.title, tasks: action.tasks, tags: action.tags, __typename: action.__typename}],
           }
       );
+    case ADD_NEW_TASK:
+      const targetTasklistIndex = state.tasklists.findIndex((t) => t.id == action.taskDataObject.tasklistID);
+      if (targetTasklistIndex === -1) {
+        return state;
+      } else {
+        const newState = Object.assign({}, state);
+        newState.tasklists[targetTasklistIndex].tasks.push({id: action.taskDataObject.id, name: action.taskDataObject.name, description: action.taskDataObject.description, state: action.taskDataObject.state, priority: action.taskDataObject.priority, startDatetime: action.taskDataObject.startDatetime, endDatetime: action.taskDataObject.endDatetime, __typename: 'Task'});
+        return newState;
+      };
     case UPDATE_BOARD:
       return Object.assign(
           {},

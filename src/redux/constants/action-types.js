@@ -5,6 +5,7 @@ export const UPDATE_NOTES = 'UPDATE_NOTES';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
 export const UPDATE_BOARDS = 'UPDATE_BOARDS';
 export const ADD_NEW_BOARD = 'ADD_NEW_BOARD';
+export const ADD_NEW_TASK = 'ADD_NEW_TASK';
 export const UPDATE_TASKLIST = 'UPDATE_TASKLIST';
 export const UPDATE_TASKLISTS = 'UPDATE_TASKLISTS';
 export const ADD_NEW_TASKLIST = 'ADD_NEW_TASKLIST';

@@ -9,24 +9,43 @@ import {ACTION_NONE} from '../redux/constants/action-types';
 import gql from 'graphql-tag';
 import {Mutation, Subscription} from 'react-apollo';
 
+const TASK_STATE_IN_PROGRESS = 'INPROGRESS';
+const TASK_STATE_FINISHED = 'FINISHED';
+const TASK_PRIORITY_LOW = 'LOW';
+const TASK_PRIORITY_NORMAL = 'NORMAL';
+const TASK_PRIORITY_HIGH = 'HIGH';
+
 const UPDATE_TASKLIST_MUTATION = gql`
   mutation UpdateTasklist($tasklistData: UpdateTasklistInput!) {
     tasklist: updateTasklist(input: $tasklistData) {
       id
       title
       tasks {
-          id
-          name
-          description
-          state
-          priority
-          startDatetime
-          endDatetime
+        id
+        name
+        description
+        state
+        priority
+        startDatetime
+        endDatetime
       }
       tags {
-          id
-          name
+        id
+        name
       }
+    }
+  }`;
+
+const ADD_TASK_TO_TASKLIST_MUTATION = gql`
+  mutation AddTaskToTasklist($taskData: AddTaskInput!) {
+    task: addTaskToTasklist(input: $taskData) {
+        id
+        name
+        description
+        state
+        priority
+        startDatetime
+        endDatetime
     }
   }`;
 
@@ -47,6 +66,7 @@ class EditTasklist extends Component {
 
     this.state = {
       titleCursorOffset: 0,
+      newTaskName: '',
     };
 
     // Referencia (Ref) a entrada de título
@@ -102,6 +122,17 @@ class EditTasklist extends Component {
     }}});
   }
 
+  handleAddTaskButton(addTaskToTasklist, e) {
+    console.log('AddTaskButton Value:', this.state.newTaskName);
+    addTaskToTasklist({variables: {taskData: {
+      'tasklistId': this.props.tasklistID,
+      'name': this.state.newTaskName,
+      'state': TASK_STATE_IN_PROGRESS,
+      'priority': TASK_PRIORITY_NORMAL,
+    }}});
+    this.setState({newTaskName: e.target.value});
+  }
+
   render() {
     //   {/* EL IDENTIFICADOR DE LA LISTA DE TAREAS DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
@@ -124,7 +155,19 @@ class EditTasklist extends Component {
           </Mutation>
           <Tabs id="uncontrolled-tab-tasklist-actions" className="mt-5 mb-3" variant="pills">
             <Tab eventKey="tasklist-new-task" title="Nueva Tarea">
-              <Form.Control type="text" className="mb-5" placeholder="Nombre de la tarea nueva a crear" />
+              <Mutation mutation={ADD_TASK_TO_TASKLIST_MUTATION}
+                onCompleted={({task}) => {
+                  this.props.addTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+                }}>
+                {(addTaskToTasklist, {data}) => (
+                  <InputGroup className="mb-5">
+                    <Form.Control placeholder="Nombre de la tarea nueva a crear" aria-label="Nombre de la tarea nueva a crear" type="text" value={this.state.newTaskName} onChange={(e) => this.setState({newTaskName: e.target.value})} />
+                    <InputGroup.Append>
+                      <Button variant="success" onClick={(e) => this.handleAddTaskButton(addTaskToTasklist, e)} >Añadir tarea</Button>
+                    </InputGroup.Append>
+                  </InputGroup>
+                )}
+              </Mutation>
             </Tab>
             <Tab eventKey="tasklist-contributors" title="Colaboradores">
               <Container className="mb-5">
