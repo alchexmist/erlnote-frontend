@@ -49,6 +49,19 @@ const ADD_TASK_TO_TASKLIST_MUTATION = gql`
     }
   }`;
 
+const UPDATE_TASK_IN_TASKLIST_MUTATION = gql`
+  mutation UpdateTaskInTasklist($taskData: UpdateTaskInput!) {
+    task: updateTaskInTasklist(input: $taskData) {
+        id
+        name
+        description
+        state
+        priority
+        startDatetime
+        endDatetime
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -71,6 +84,7 @@ class EditTasklist extends Component {
 
     // Referencia (Ref) a entrada de título
     this.tasklistTitleInput = React.createRef();
+    this.newTaskTextField = React.createRef();
 
     this.moreMutations = false;
   }
@@ -130,7 +144,61 @@ class EditTasklist extends Component {
       'state': TASK_STATE_IN_PROGRESS,
       'priority': TASK_PRIORITY_NORMAL,
     }}});
-    this.setState({newTaskName: e.target.value});
+    // this.setState({newTaskName: e.target.value});
+  }
+
+  handleFinishedTask(updateTaskInTasklist, t, e) {
+    let newTaskState = null;
+    if (t.state = TASK_STATE_FINISHED) {
+      newTaskState = TASK_STATE_IN_PROGRESS;
+    } else {
+      newTaskState = TASK_STATE_FINISHED;
+    }
+    //Disparar la mutación de cambio de estado para la tarea.
+    updateTaskInTasklist({variables: {taskData: {
+        'id': t.id,
+        'tasklistId': this.props.tasklistID,
+        'name': t.name,
+        'state': newTaskState,
+        'priority': t.priority,
+      }}});
+      // QUEDA IMPLEMENTAR updateTask para Redux.
+    // this.setState({ state: this.state });
+  }
+
+  tasklistLine(t) {
+    return (
+      <ListGroup.Item key={t.id} as="div" variant="dark">
+        <InputGroup>
+          <InputGroup.Prepend>
+          <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
+                onCompleted={({task}) => {
+                  this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+                }}>
+                {(updateTaskInTasklist, {data}) => (
+            <InputGroup.Checkbox key={t.id} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTask(updateTaskInTasklist, t, e)} />
+            )}
+            </Mutation>
+          </InputGroup.Prepend>
+          <Form.Control className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
+          <InputGroup.Append>
+            <DropdownButton
+              variant="outline-secondary"
+              title="Dropdown"
+              id="input-group-dropdown-2"
+            >
+              <Dropdown.Item href="#">Action</Dropdown.Item>
+              <Dropdown.Item href="#">Another action</Dropdown.Item>
+              <Dropdown.Item href="#">Something else here</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item href="#">Separated link</Dropdown.Item>
+            </DropdownButton>
+            <Button variant="outline-dark">Button</Button>
+            <Button variant="outline-danger">Eliminar</Button>
+          </InputGroup.Append>
+        </InputGroup>
+      </ListGroup.Item>
+    );
   }
 
   render() {
@@ -158,10 +226,12 @@ class EditTasklist extends Component {
               <Mutation mutation={ADD_TASK_TO_TASKLIST_MUTATION}
                 onCompleted={({task}) => {
                   this.props.addTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+                  this.setState({newTaskName: ''});
+                  this.newTaskTextField.current.focus();
                 }}>
                 {(addTaskToTasklist, {data}) => (
                   <InputGroup className="mb-5">
-                    <Form.Control placeholder="Nombre de la tarea nueva a crear" aria-label="Nombre de la tarea nueva a crear" type="text" value={this.state.newTaskName} onChange={(e) => this.setState({newTaskName: e.target.value})} />
+                    <Form.Control ref={this.newTaskTextField} placeholder="Nombre de la tarea nueva a crear" aria-label="Nombre de la tarea nueva a crear" type="text" value={this.state.newTaskName} onChange={(e) => this.setState({newTaskName: e.target.value})} />
                     <InputGroup.Append>
                       <Button variant="success" onClick={(e) => this.handleAddTaskButton(addTaskToTasklist, e)} >Añadir tarea</Button>
                     </InputGroup.Append>
@@ -233,50 +303,7 @@ class EditTasklist extends Component {
           </Tabs>
 
           <ListGroup id="tasklist-listgroup" style={{'maxHeight': 300, 'overflowY': 'auto'}}>
-            <ListGroup.Item as="div" variant="dark">
-              <Form.Group as={Row} controlId="formPlaintextEmail">
-                <Col sm="1">
-                  <Form.Check type="checkbox" aria-label="option 1" />
-                </Col>
-                {/* <Form.Label column sm="2">
-      Email
-                </Form.Label> */}
-                <Col sm="10">
-                  <Form.Control plaintext defaultValue="email@example.com" />
-                </Col>
-                <Col sm="1">
-                  <Button variant="danger">
-                      Eliminar
-                  </Button>
-                </Col>
-              </Form.Group>
-            </ListGroup.Item>
-            <ListGroup.Item as="div" variant="dark">
-              <InputGroup>
-                <InputGroup.Prepend>
-                  <InputGroup.Checkbox aria-label="Checkbox for following text input" />
-                </InputGroup.Prepend>
-                <Form.Control className="mx-1" plaintext aria-label="Text input with checkbox" defaultValue="Primera tarea" />
-                <InputGroup.Append>
-                  <DropdownButton
-                    variant="outline-secondary"
-                    title="Dropdown"
-                    id="input-group-dropdown-2"
-                  >
-                    <Dropdown.Item href="#">Action</Dropdown.Item>
-                    <Dropdown.Item href="#">Another action</Dropdown.Item>
-                    <Dropdown.Item href="#">Something else here</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item href="#">Separated link</Dropdown.Item>
-                  </DropdownButton>
-                  <Button variant="outline-dark">Button</Button>
-                  <Button variant="outline-danger">Eliminar</Button>
-                </InputGroup.Append>
-              </InputGroup>
-            </ListGroup.Item>
-            <ListGroup.Item as="div" variant="dark">Morbi leo risus</ListGroup.Item>
-            <ListGroup.Item as="div" variant="dark">Porta ac consectetur ac</ListGroup.Item>
-            <ListGroup.Item as="div" variant="dark">Vestibulum at eros</ListGroup.Item>
+            {this.props.tasklistTasks.map((t) => this.tasklistLine(t))}
           </ListGroup>
 
           <Form.Row className="my-5" style={{'maxHeight': 100, 'overflowY': 'auto'}}>
