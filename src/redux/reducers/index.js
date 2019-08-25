@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -70,6 +70,19 @@ function rootReducer(state = initialState, action) {
       } else {
         const newState = Object.assign({}, state);
         newState.tasklists[targetTasklistIndex].tasks.push({id: action.taskDataObject.id, name: action.taskDataObject.name, description: action.taskDataObject.description, state: action.taskDataObject.state, priority: action.taskDataObject.priority, startDatetime: action.taskDataObject.startDatetime, endDatetime: action.taskDataObject.endDatetime, __typename: 'Task'});
+        return newState;
+      };
+    case UPDATE_TASK:
+      const updateTaskTasklistIndex = state.tasklists.findIndex((t) => t.id == action.taskDataObject.tasklistID);
+      if (updateTaskTasklistIndex === -1) {
+        return state;
+      } else {
+        const newState = Object.assign({}, state);
+        const updatedTasks = state.tasklists[updateTaskTasklistIndex].tasks.slice();
+        const updateTaskTaskIndex = updatedTasks.findIndex((t) => t.id == action.taskDataObject.id);
+        updatedTasks.splice(updateTaskTaskIndex, 1, {id: action.taskDataObject.id, name: action.taskDataObject.name, description: action.taskDataObject.description, state: action.taskDataObject.state, priority: action.taskDataObject.priority, startDatetime: action.taskDataObject.startDatetime, endDatetime: action.taskDataObject.endDatetime, __typename: 'Task'});
+        newState.tasklists[updateTaskTasklistIndex].tasks = updatedTasks;
+
         return newState;
       };
     case UPDATE_BOARD:

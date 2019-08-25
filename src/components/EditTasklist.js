@@ -80,6 +80,7 @@ class EditTasklist extends Component {
     this.state = {
       titleCursorOffset: 0,
       newTaskName: '',
+      tasklistTextfieldItemRefs: {},
     };
 
     // Referencia (Ref) a entrada de título
@@ -147,22 +148,24 @@ class EditTasklist extends Component {
     // this.setState({newTaskName: e.target.value});
   }
 
-  handleFinishedTask(updateTaskInTasklist, t, e) {
+  handleFinishedTaskCheckbox(updateTaskInTasklist, t, e) {
     let newTaskState = null;
-    if (t.state = TASK_STATE_FINISHED) {
+    console.log('ESTADO VIEJO DE LA TAREA: ', t.state);
+    if (t.state === TASK_STATE_FINISHED) {
       newTaskState = TASK_STATE_IN_PROGRESS;
     } else {
       newTaskState = TASK_STATE_FINISHED;
     }
+    console.log('ESTADO NUEVO DE LA TAREA: ', newTaskState);
     //Disparar la mutación de cambio de estado para la tarea.
     updateTaskInTasklist({variables: {taskData: {
-        'id': t.id,
-        'tasklistId': this.props.tasklistID,
-        'name': t.name,
-        'state': newTaskState,
-        'priority': t.priority,
-      }}});
-      // QUEDA IMPLEMENTAR updateTask para Redux.
+      'id': t.id,
+      'tasklistId': this.props.tasklistID,
+      'name': t.name,
+      'state': newTaskState,
+      'priority': t.priority,
+    }}});
+    // QUEDA IMPLEMENTAR updateTask para Redux.
     // this.setState({ state: this.state });
   }
 
@@ -171,30 +174,33 @@ class EditTasklist extends Component {
       <ListGroup.Item key={t.id} as="div" variant="dark">
         <InputGroup>
           <InputGroup.Prepend>
-          <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
-                onCompleted={({task}) => {
-                  this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
-                }}>
-                {(updateTaskInTasklist, {data}) => (
-            <InputGroup.Checkbox key={t.id} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTask(updateTaskInTasklist, t, e)} />
-            )}
+            <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
+              onCompleted={({task}) => {
+                this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+                console.log('ESTADO DE LA TAREA RESULTADO DE MUTACIÓN: ', task.state);
+              }}>
+              {(updateTaskInTasklist, {data}) => (
+                <InputGroup.Checkbox key={t.id} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTaskCheckbox(updateTaskInTasklist, t, e)} />
+              )}
             </Mutation>
           </InputGroup.Prepend>
           <Form.Control className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
           <InputGroup.Append>
             <DropdownButton
-              variant="outline-secondary"
-              title="Dropdown"
+              variant={(t.priority === TASK_PRIORITY_NORMAL) ? "warning" : ((t.priority === TASK_PRIORITY_HIGH) ? "danger" : "success")}
+              title={(t.priority === TASK_PRIORITY_NORMAL) ? "Prioridad normal" : ((t.priority === TASK_PRIORITY_HIGH) ? "Prioridad alta" : "Prioridad baja")}
               id="input-group-dropdown-2"
+              className="mr-1"
             >
-              <Dropdown.Item href="#">Action</Dropdown.Item>
-              <Dropdown.Item href="#">Another action</Dropdown.Item>
-              <Dropdown.Item href="#">Something else here</Dropdown.Item>
+              <Dropdown.Item >Prioridad baja</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#">Separated link</Dropdown.Item>
+              <Dropdown.Item >Prioridad alta</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item >Prioridad normal</Dropdown.Item>
+              
             </DropdownButton>
-            <Button variant="outline-dark">Button</Button>
-            <Button variant="outline-danger">Eliminar</Button>
+            <Button variant="primary" className="mr-1">Editar</Button>
+            <Button variant="danger">Eliminar</Button>
           </InputGroup.Append>
         </InputGroup>
       </ListGroup.Item>
@@ -302,7 +308,20 @@ class EditTasklist extends Component {
             </Tab>
           </Tabs>
 
-          <ListGroup id="tasklist-listgroup" style={{'maxHeight': 300, 'overflowY': 'auto'}}>
+          <ListGroup id="tasklist-listgroup" style={{'minHeight': 150, 'maxHeight': 300, 'overflowY': 'auto'}}>
+            {/* {
+              this.setState({tasklistTextfieldItemRefs:
+              this.props.tasklistTasks.map((t) => {
+                return ({
+                  [t.id]: React.createRef(),
+                });
+              }).reduce(function(acc, currentVal) {
+                return Object.assign(acc, currentVal);
+              }),
+              })
+            }
+            {console.log('ESTADO: ', this.state.tasklistTextfieldItemRefs)} */}
+
             {this.props.tasklistTasks.map((t) => this.tasklistLine(t))}
           </ListGroup>
 
