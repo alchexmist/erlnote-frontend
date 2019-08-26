@@ -80,7 +80,7 @@ class EditTasklist extends Component {
     this.state = {
       titleCursorOffset: 0,
       newTaskName: '',
-      tasklistTextfieldItemRefs: {},
+    //   tasklistTextfieldItemRefs: {},
     };
 
     // Referencia (Ref) a entrada de título
@@ -169,6 +169,21 @@ class EditTasklist extends Component {
     // this.setState({ state: this.state });
   }
 
+  handleTaskEditButton(taskID, e) {
+    this[`taskTextfieldItemRef${taskID}`].focus();
+  }
+
+  handlePriorityDropdown(t, updateTaskInTasklist, eventKey, e) {
+      console.log('EVENTKEY: ', eventKey);
+      updateTaskInTasklist({variables: {taskData: {
+        'id': t.id,
+        'tasklistId': this.props.tasklistID,
+        'name': t.name,
+        'state': t.state,
+        'priority': eventKey,
+      }}});
+  }
+
   tasklistLine(t) {
     return (
       <ListGroup.Item key={t.id} as="div" variant="dark">
@@ -184,22 +199,30 @@ class EditTasklist extends Component {
               )}
             </Mutation>
           </InputGroup.Prepend>
-          <Form.Control className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
+          <Form.Control ref={(input) => {this[`taskTextfieldItemRef${t.id}`] = input;}} className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
           <InputGroup.Append>
+          <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
+              onCompleted={({task}) => {
+                this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+                console.log('ESTADO DE LA TAREA RESULTADO DE MUTACIÓN: ', task.state);
+              }}>
+              {(updateTaskInTasklist, {data}) => (
             <DropdownButton
-              variant={(t.priority === TASK_PRIORITY_NORMAL) ? "warning" : ((t.priority === TASK_PRIORITY_HIGH) ? "danger" : "success")}
-              title={(t.priority === TASK_PRIORITY_NORMAL) ? "Prioridad normal" : ((t.priority === TASK_PRIORITY_HIGH) ? "Prioridad alta" : "Prioridad baja")}
+              variant={(t.priority === TASK_PRIORITY_NORMAL) ? 'warning' : ((t.priority === TASK_PRIORITY_HIGH) ? 'danger' : 'success')}
+              title={(t.priority === TASK_PRIORITY_NORMAL) ? 'Prioridad normal' : ((t.priority === TASK_PRIORITY_HIGH) ? 'Prioridad alta' : 'Prioridad baja')}
               id="input-group-dropdown-2"
               className="mr-1"
             >
-              <Dropdown.Item >Prioridad baja</Dropdown.Item>
+              <Dropdown.Item eventKey={TASK_PRIORITY_LOW} onSelect={(eventKey, e) => this.handlePriorityDropdown(t, updateTaskInTasklist, eventKey, e)}>Prioridad baja</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item >Prioridad alta</Dropdown.Item>
+              <Dropdown.Item eventKey={TASK_PRIORITY_HIGH} onSelect={(eventKey, e) => this.handlePriorityDropdown(t, updateTaskInTasklist, eventKey, e)}>Prioridad alta</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item >Prioridad normal</Dropdown.Item>
+              <Dropdown.Item eventKey={TASK_PRIORITY_NORMAL} onSelect={(eventKey, e) => this.handlePriorityDropdown(t, updateTaskInTasklist, eventKey, e)}>Prioridad normal</Dropdown.Item>
               
             </DropdownButton>
-            <Button variant="primary" className="mr-1">Editar</Button>
+            )}
+            </Mutation>
+            <Button variant="primary" className="mr-1" onClick={(e) => this.handleTaskEditButton(t.id, e)}>Editar</Button>
             <Button variant="danger">Eliminar</Button>
           </InputGroup.Append>
         </InputGroup>
