@@ -124,6 +124,16 @@ function rootReducer(state = initialState, action) {
       }
       if (newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags && newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.findIndex((t) => t.id == action.tagDataObject.id) === -1) {
         newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.push({id: action.tagDataObject.id, name: action.tagDataObject.name, __typename: 'Tag'});
+        // newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.sort(function(a, b) {
+        //   if (a.name > b.name) {
+        //     return 1;
+        //   }
+        //   if (a.name < b.name) {
+        //     return -1;
+        //   }
+        //   // a must be equal to b
+        //   return 0;
+        // });
       }
       return newStateAddTagTasklist;
     case REMOVE_TAG_TASKLIST:
@@ -136,6 +146,16 @@ function rootReducer(state = initialState, action) {
         const removeTagTasklistTargetIndex = newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.findIndex((t) => t.name == action.tagDataObject.name);
         if (removeTagTasklistTargetIndex !== -1) {
           newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.splice(removeTagTasklistTargetIndex, 1);
+          // newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.sort(function(a, b) {
+          //   if (a.name > b.name) {
+          //     return 1;
+          //   }
+          //   if (a.name < b.name) {
+          //     return -1;
+          //   }
+          //   // a must be equal to b
+          //   return 0;
+          // });
           return newStateRemoveTagTasklist;
         }
       }
