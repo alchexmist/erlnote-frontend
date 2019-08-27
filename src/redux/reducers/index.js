@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -116,6 +116,30 @@ function rootReducer(state = initialState, action) {
             tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
           }
       );
+    case ADD_TAG_TASKLIST:
+      const newStateAddTagTasklist = Object.assign({}, state);
+      const addTagTasklistIndex = newStateAddTagTasklist.tasklists.findIndex((t) => t.id == action.tagDataObject.tasklistID);
+      if (addTagTasklistIndex === -1) {
+        return newStateAddTagTasklist;
+      }
+      if (newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags && newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.findIndex((t) => t.id == action.tagDataObject.id) === -1) {
+        newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.push({id: action.tagDataObject.id, name: action.tagDataObject.name, __typename: 'Tag'});
+      }
+      return newStateAddTagTasklist;
+    case REMOVE_TAG_TASKLIST:
+      const newStateRemoveTagTasklist = Object.assign({}, state);
+      const removeTagTasklistIndex = newStateRemoveTagTasklist.tasklists.findIndex((t) => t.id == action.tagDataObject.tasklistID);
+      if (removeTagTasklistIndex === -1) {
+        return newStateRemoveTagTasklist;
+      }
+      if (newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags) {
+        const removeTagTasklistTargetIndex = newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.findIndex((t) => t.name == action.tagDataObject.name);
+        if (removeTagTasklistTargetIndex !== -1) {
+          newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.splice(removeTagTasklistTargetIndex, 1);
+          return newStateRemoveTagTasklist;
+        }
+      }
+      return newStateRemoveTagTasklist;
     case UPDATE_TASKLISTS:
       const updatedTasklists = state.tasklists.filter((tasklist) => {
         // const newIDs = action.noteList.map((updatedNote) => updatedNote.id);

@@ -201,7 +201,6 @@ class EditTasklist extends Component {
   }
 
   handleAddTagButton(linkTagToTasklist, e) {
-    console.log('Presionado añadir etiqueta');
     // this.addTagButton.current.value
     linkTagToTasklist({variables: {
       tasklistID: this.props.tasklistID,
@@ -210,8 +209,8 @@ class EditTasklist extends Component {
   }
 
   handleRemoveTagButton(removeTagFromTasklist, e) {
-    console.log('Presionado eliminar etiqueta');
     // this.addTagButton.current.value
+    this.props.removeTagTasklist({tasklistID: this.props.tasklistID, name: this.state.addTagTextfield});
     removeTagFromTasklist({variables: {
       tasklistID: this.props.tasklistID,
       tagName: this.state.addTagTextfield,
@@ -260,6 +259,14 @@ class EditTasklist extends Component {
           </InputGroup.Append>
         </InputGroup>
       </ListGroup.Item>
+    );
+  }
+
+  tasklistTag(t) {
+    return (
+      <Badge key={t.id} className="mx-1" pill variant="dark">
+        {t.name}
+      </Badge>
     );
   }
 
@@ -351,6 +358,7 @@ class EditTasklist extends Component {
                       <Mutation mutation={LINK_TAG_TO_TASKLIST_MUTATION}
                         onCompleted={({tag}) => {
                           console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN: ', tag.id, tag.name);
+                          this.props.addTagTasklist({tasklistID: this.props.tasklistID, id: tag.id, name: tag.name});
                           this.setState({addTagTextfield: ''});
                         }}>
                         {(linkTagToTasklist, {data}) => (
@@ -360,17 +368,15 @@ class EditTasklist extends Component {
                       <Dropdown.Toggle split variant="success" id="dropdown-split-basic" />
 
                       <Dropdown.Menu>
-                      <Mutation mutation={REMOVE_TAG_FROM_TASKLIST_MUTATION}
-                        onCompleted={({removeTagFromTasklist}) => {
-                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', removeTagFromTasklist.msg);
-                          this.setState({addTagTextfield: ''});
-                        }}>
-                        {(removeTagFromTasklist, {data}) => (
-                        <Dropdown.Item onClick={(e) => this.handleRemoveTagButton(removeTagFromTasklist, e)}>Eliminar</Dropdown.Item>
-                        )}
+                        <Mutation mutation={REMOVE_TAG_FROM_TASKLIST_MUTATION}
+                          onCompleted={({removeTagFromTasklist}) => {
+                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', removeTagFromTasklist.msg);
+                            this.setState({addTagTextfield: ''});
+                          }}>
+                          {(removeTagFromTasklist, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleRemoveTagButton(removeTagFromTasklist, e)}>Eliminar</Dropdown.Item>
+                          )}
                         </Mutation>
-                        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                        <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                   </Col>
@@ -397,7 +403,8 @@ class EditTasklist extends Component {
           </ListGroup>
 
           <Form.Row className="my-5" style={{'maxHeight': 100, 'overflowY': 'auto'}}>
-            <Badge className="mx-1" pill variant="primary">
+            {this.props.tasklistTags.map((t) => this.tasklistTag(t))}
+            {/* <Badge className="mx-1" pill variant="primary">
     Primary
             </Badge>
             <Badge className="mx-1" pill variant="secondary">
@@ -420,7 +427,7 @@ class EditTasklist extends Component {
             </Badge>
             <Badge className="mx-1" pill variant="dark">
     Dark
-            </Badge>
+            </Badge> */}
           </Form.Row>
         </Form>
       </Container>
