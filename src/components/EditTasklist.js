@@ -91,6 +91,14 @@ const DELETE_TASKLIST_CONTRIBUTOR_MUTATION = gql`
     }
   }`;
 
+const DELETE_TASKLIST_MUTATION = gql`
+  mutation DeleteTasklistUser($data: ID!) {
+    deleteTasklistUser(tasklistId: $data) {
+      id
+      title
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -126,6 +134,7 @@ class EditTasklist extends Component {
   }
 
   componentDidMount() {
+    document.getElementById('root').scrollTop = 0;
     this.props.setUserAction({userActionName: ACTION_NONE, actionEntityID: this.props.match.params.id});
     this.tasklistTitleInput.current.focus();
   }
@@ -253,6 +262,12 @@ class EditTasklist extends Component {
       'tid': this.props.tasklistID,
     }}});
     this.tasklistContributorInput.current.focus();
+  }
+
+  handleDeleteTasklistButton(deleteTasklistUser, e) {
+    deleteTasklistUser({variables: {data: this.props.tasklistID}});
+    this.props.deleteTasklist({tasklistID: this.props.tasklistID});
+    this.props.history.push('/dashboard');
   }
 
   tasklistLine(t) {
@@ -398,22 +413,22 @@ class EditTasklist extends Component {
                       </Mutation>
                       <Dropdown.Toggle split variant="success" id="dropdown-split-remove-tasklist-contributor" />
                       <Dropdown.Menu>
-                      <Mutation mutation={DELETE_TASKLIST_CONTRIBUTOR_MUTATION}
-                        onCompleted={({deleteTasklistContributor}) => {
-                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN DE BORRADO: ', deleteTasklistContributor.msg);
-                          this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
-                        }}>
-                        {(deleteTasklistContributor, {data}) => (
-                        <Dropdown.Item onClick={(e) => this.handleDeleteContributorButton(deleteTasklistContributor, e)}>Eliminar</Dropdown.Item>
-                        )}
-                      </Mutation>
+                        <Mutation mutation={DELETE_TASKLIST_CONTRIBUTOR_MUTATION}
+                          onCompleted={({deleteTasklistContributor}) => {
+                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN DE BORRADO: ', deleteTasklistContributor.msg);
+                            this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                          }}>
+                          {(deleteTasklistContributor, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleDeleteContributorButton(deleteTasklistContributor, e)}>Eliminar</Dropdown.Item>
+                          )}
+                        </Mutation>
                       </Dropdown.Menu>
                     </Dropdown>
                   </Col>
                 </Row>
               </Container>
             </Tab>
-            <Tab eventKey="contact" title="Etiquetas">
+            <Tab eventKey="tasklist-tags" title="Etiquetas">
               <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
@@ -445,6 +460,22 @@ class EditTasklist extends Component {
                         </Mutation>
                       </Dropdown.Menu>
                     </Dropdown>
+                  </Col>
+                </Row>
+              </Container>
+            </Tab>
+            <Tab eventKey="tasklist-delete" title="Eliminar lista de tareas">
+              <Container className="mb-5">
+                <Row className="justify-content-center">
+                  <Col xs lg md sm xl="4">
+                  <Mutation mutation={DELETE_TASKLIST_MUTATION}
+                          onCompleted={({deleteTasklistUser}) => {
+                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteTasklistUser.id, deleteTasklistUser.title);
+                          }}>
+                          {(deleteTasklistUser, {data}) => (
+                    <Button variant='danger' onClick={(e) => this.handleDeleteTasklistButton(deleteTasklistUser, e)}>Eliminar lista de tareas</Button>
+                    )}
+                        </Mutation>
                   </Col>
                 </Row>
               </Container>
