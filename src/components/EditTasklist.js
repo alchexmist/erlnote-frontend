@@ -77,6 +77,20 @@ const REMOVE_TAG_FROM_TASKLIST_MUTATION = gql`
     }
   }`;
 
+const ADD_TASKLIST_CONTRIBUTOR_MUTATION = gql`
+  mutation AddTasklistContributor($data: AddTasklistContributorFilter!) {
+    addTasklistContributor(filter: $data) {
+      msg
+    }
+  }`;
+
+const DELETE_TASKLIST_CONTRIBUTOR_MUTATION = gql`
+  mutation DeleteTasklistContributor($data: DeleteTasklistContributorFilter!) {
+    deleteTasklistContributor(filter: $data) {
+      msg
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -96,6 +110,9 @@ class EditTasklist extends Component {
       titleCursorOffset: 0,
       newTaskName: '',
       addTagTextfield: '',
+      addContributorTextfield: '',
+      readWriteRadioChecked: true,
+      onlyReadRadioChecked: false,
     //   tasklistTextfieldItemRefs: {},
     };
 
@@ -103,6 +120,7 @@ class EditTasklist extends Component {
     this.tasklistTitleInput = React.createRef();
     this.newTaskTextField = React.createRef();
     this.addTagButton = React.createRef();
+    this.tasklistContributorInput = React.createRef();
 
     this.moreMutations = false;
   }
@@ -217,6 +235,26 @@ class EditTasklist extends Component {
     }});
   }
 
+  handleAddContributorButton(addTasklistContributor, e) {
+    addTasklistContributor({variables: {data: {
+      'type': 'USERNAME',
+      'value': this.state.addContributorTextfield,
+      'tid': this.props.tasklistID,
+      'canRead': true,
+      'canWrite': this.state.readWriteRadioChecked,
+    }}});
+    this.tasklistContributorInput.current.focus();
+  }
+
+  handleDeleteContributorButton(deleteTasklistContributor, e) {
+    deleteTasklistContributor({variables: {data: {
+      'type': 'USERNAME',
+      'value': this.state.addContributorTextfield,
+      'tid': this.props.tasklistID,
+    }}});
+    this.tasklistContributorInput.current.focus();
+  }
+
   tasklistLine(t) {
     return (
       <ListGroup.Item key={t.id} as="div" variant="dark">
@@ -312,7 +350,7 @@ class EditTasklist extends Component {
               <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
-                    <Form.Control placeholder="Nombre de usuario" />
+                    <Form.Control ref={this.tasklistContributorInput} placeholder="Nombre de usuario" value={this.state.addContributorTextfield} onChange={(e) => this.setState({addContributorTextfield: e.target.value})}/>
                   </Col>
                   <Col xs lg md sm xl="2">
                     <Form.Check
@@ -320,6 +358,14 @@ class EditTasklist extends Component {
                       inline
                       label="Leer"
                       type="radio"
+                      checked={this.state.onlyReadRadioChecked}
+                      onChange={(e) => {
+                        if (e.target.checked === true) {
+                          this.setState({onlyReadRadioChecked: true, readWriteRadioChecked: false});
+                        } else {
+                          this.setState({onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        }
+                      }}
                       id="tasklist-read-only"
                     />
 
@@ -328,18 +374,39 @@ class EditTasklist extends Component {
                       inline
                       label="Leer y editar"
                       type="radio"
-                      defaultChecked="true"
+                      checked={this.state.readWriteRadioChecked}
+                      onChange={(e) => {
+                        if (e.target.checked === true) {
+                          this.setState({onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        } else {
+                          this.setState({onlyReadRadioChecked: true, readWriteRadioChecked: false});
+                        }
+                      }}
                       id="tasklist-read-write"
                     />
                   </Col>
                   <Col xs lg md sm xl="2">
                     <Dropdown as={ButtonGroup}>
-                      <Button variant="success">Añadir</Button>
-
-                      <Dropdown.Toggle split variant="success" id="dropdown-split-basic" />
-
+                      <Mutation mutation={ADD_TASKLIST_CONTRIBUTOR_MUTATION}
+                        onCompleted={({addTasklistContributor}) => {
+                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN: ', addTasklistContributor.msg);
+                          this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        }}>
+                        {(addTasklistContributor, {data}) => (
+                          <Button variant="success" onClick={(e) => this.handleAddContributorButton(addTasklistContributor, e)}>Añadir</Button>
+                        )}
+                      </Mutation>
+                      <Dropdown.Toggle split variant="success" id="dropdown-split-remove-tasklist-contributor" />
                       <Dropdown.Menu>
-                        <Dropdown.Item >Eliminar</Dropdown.Item>
+                      <Mutation mutation={DELETE_TASKLIST_CONTRIBUTOR_MUTATION}
+                        onCompleted={({deleteTasklistContributor}) => {
+                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN DE BORRADO: ', deleteTasklistContributor.msg);
+                          this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        }}>
+                        {(deleteTasklistContributor, {data}) => (
+                        <Dropdown.Item onClick={(e) => this.handleDeleteContributorButton(deleteTasklistContributor, e)}>Eliminar</Dropdown.Item>
+                        )}
+                      </Mutation>
                       </Dropdown.Menu>
                     </Dropdown>
                   </Col>
