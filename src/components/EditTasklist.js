@@ -7,7 +7,7 @@ import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
 
 import gql from 'graphql-tag';
-import {Mutation, Subscription} from 'react-apollo';
+import {Mutation, Query, Subscription} from 'react-apollo';
 
 const TASK_STATE_IN_PROGRESS = 'INPROGRESS';
 const TASK_STATE_FINISHED = 'FINISHED';
@@ -99,6 +99,19 @@ const DELETE_TASKLIST_MUTATION = gql`
     }
   }`;
 
+const GET_TASKLIST_ACCESS_INFO_QUERY = gql`
+  query GetAccessInfo($entityId: ID!) {
+    getAccessInfo(entityId: $entityId, entityType: TASKLIST) {
+      ... on TasklistAccessInfo {
+        ownerId
+        userId
+        canRead
+        canWrite
+        tasklistId
+      }
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -121,6 +134,7 @@ class EditTasklist extends Component {
       addContributorTextfield: '',
       readWriteRadioChecked: true,
       onlyReadRadioChecked: false,
+      userCanEdit: true,
     //   tasklistTextfieldItemRefs: {},
     };
 
@@ -281,11 +295,11 @@ class EditTasklist extends Component {
                 console.log('ESTADO DE LA TAREA RESULTADO DE MUTACIÓN: ', task.state);
               }}>
               {(updateTaskInTasklist, {data}) => (
-                <InputGroup.Checkbox key={t.id} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTaskCheckbox(updateTaskInTasklist, t, e)} />
+                <InputGroup.Checkbox key={t.id} disabled={!this.state.userCanEdit} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTaskCheckbox(updateTaskInTasklist, t, e)} />
               )}
             </Mutation>
           </InputGroup.Prepend>
-          <Form.Control ref={(input) => {this[`taskTextfieldItemRef${t.id}`] = input;}} className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
+          <Form.Control ref={(input) => {this[`taskTextfieldItemRef${t.id}`] = input;}} disabled={!this.state.userCanEdit} className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
           <InputGroup.Append>
             <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
               onCompleted={({task}) => {
@@ -298,6 +312,7 @@ class EditTasklist extends Component {
                   title={(t.priority === TASK_PRIORITY_NORMAL) ? 'Prioridad normal' : ((t.priority === TASK_PRIORITY_HIGH) ? 'Prioridad alta' : 'Prioridad baja')}
                   id="input-group-dropdown-2"
                   className="mr-1"
+                  disabled={!this.state.userCanEdit}
                 >
                   <Dropdown.Item eventKey={TASK_PRIORITY_LOW} onSelect={(eventKey, e) => this.handlePriorityDropdown(t, updateTaskInTasklist, eventKey, e)}>Prioridad baja</Dropdown.Item>
                   <Dropdown.Divider />
@@ -307,8 +322,8 @@ class EditTasklist extends Component {
                 </DropdownButton>
               )}
             </Mutation>
-            <Button variant="primary" className="mr-1" onClick={(e) => this.handleTaskEditButton(t.id, e)}>Editar</Button>
-            <Button variant="danger">Eliminar</Button>
+            <Button variant="primary" className="mr-1" disabled={!this.state.userCanEdit} onClick={(e) => this.handleTaskEditButton(t.id, e)}>Editar</Button>
+            <Button variant="danger" disabled={!this.state.userCanEdit}>Eliminar</Button>
           </InputGroup.Append>
         </InputGroup>
       </ListGroup.Item>
@@ -329,6 +344,21 @@ class EditTasklist extends Component {
     return (
       <Container className="my-3">
         <Form>
+        <Query query={GET_TASKLIST_ACCESS_INFO_QUERY}
+          variables={{entityId: this.props.match.params.id}}
+          fetchPolicy={'cache-and-network'}
+          onCompleted={({getAccessInfo}) => {
+            console.log('QUERY RESULT: ', getAccessInfo.canWrite);
+            this.setState({userCanEdit: getAccessInfo.canWrite});
+          }}
+        >
+          {({loading, error, data}) => {
+            if (loading) return null;
+            if (error) return null;
+
+            return null;
+          }}
+        </Query>
           <Mutation mutation={UPDATE_TASKLIST_MUTATION}
             onCompleted={({tasklist}) => {
               this.props.updateTasklist({id: tasklist.id, title: tasklist.title, tasks: tasklist.tasks, tags: tasklist.tags, __typename: 'Tasklist'});
@@ -339,7 +369,7 @@ class EditTasklist extends Component {
                 <InputGroup.Prepend>
                   <InputGroup.Text>Título</InputGroup.Text>
                 </InputGroup.Prepend>
-                <Form.Control ref={this.tasklistTitleInput} size="lg" type="text" placeholder="Título de la lista de tareas" defaultValue={(this.props.tasklistTitle !== null) ? this.props.tasklistTitle : ''} onChange={(e) => this.handleTitleChange(updateTasklist, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
+                <Form.Control ref={this.tasklistTitleInput} disabled={!this.state.userCanEdit} size="lg" type="text" placeholder="Título de la lista de tareas" defaultValue={(this.props.tasklistTitle !== null) ? this.props.tasklistTitle : ''} onChange={(e) => this.handleTitleChange(updateTasklist, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
               </InputGroup>
             )}
           </Mutation>
@@ -353,15 +383,15 @@ class EditTasklist extends Component {
                 }}>
                 {(addTaskToTasklist, {data}) => (
                   <InputGroup className="mb-5">
-                    <Form.Control ref={this.newTaskTextField} placeholder="Nombre de la tarea nueva a crear" aria-label="Nombre de la tarea nueva a crear" type="text" value={this.state.newTaskName} onChange={(e) => this.setState({newTaskName: e.target.value})} />
+                    <Form.Control ref={this.newTaskTextField} disabled={!this.state.userCanEdit} placeholder="Nombre de la tarea nueva a crear" aria-label="Nombre de la tarea nueva a crear" type="text" value={this.state.newTaskName} onChange={(e) => this.setState({newTaskName: e.target.value})} />
                     <InputGroup.Append>
-                      <Button variant="success" onClick={(e) => this.handleAddTaskButton(addTaskToTasklist, e)} >Añadir tarea</Button>
+                      <Button variant="success" disabled={!this.state.userCanEdit} onClick={(e) => this.handleAddTaskButton(addTaskToTasklist, e)} >Añadir tarea</Button>
                     </InputGroup.Append>
                   </InputGroup>
                 )}
               </Mutation>
             </Tab>
-            <Tab eventKey="tasklist-contributors" title="Colaboradores">
+            <Tab eventKey="tasklist-contributors" disabled={!this.state.userCanEdit} title="Colaboradores">
               <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
@@ -428,7 +458,7 @@ class EditTasklist extends Component {
                 </Row>
               </Container>
             </Tab>
-            <Tab eventKey="tasklist-tags" title="Etiquetas">
+            <Tab eventKey="tasklist-tags" disabled={!this.state.userCanEdit} title="Etiquetas">
               <Container className="mb-5">
                 <Row className="justify-content-start">
                   <Col xs lg md sm xl="4">
