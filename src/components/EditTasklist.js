@@ -112,6 +112,14 @@ const GET_TASKLIST_ACCESS_INFO_QUERY = gql`
     }
   }`;
 
+const DELETE_TASK_FROM_TASKLIST_MUTATION = gql`
+  mutation DeleteTaskFromTasklist($taskId: ID!, $tasklistId: ID!) {
+    deleteTaskFromTasklist(taskId: $taskId, tasklistId: $tasklistId) {
+      id
+      name
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -284,6 +292,15 @@ class EditTasklist extends Component {
     this.props.history.push('/dashboard');
   }
 
+  handleDeleteTaskButton(taskId, deleteTaskFromTasklist, e) {
+    this.props.deleteTask({tasklistID: this.props.tasklistID, id: taskId});
+    deleteTaskFromTasklist({variables: {
+      taskId: taskId,
+      tasklistId: this.props.tasklistID,
+    }});
+    this.setState({state: this.state});
+  }
+
   tasklistLine(t) {
     return (
       <ListGroup.Item key={t.id} as="div" variant="dark">
@@ -323,7 +340,15 @@ class EditTasklist extends Component {
               )}
             </Mutation>
             <Button variant="primary" className="mr-1" disabled={!this.state.userCanEdit} onClick={(e) => this.handleTaskEditButton(t.id, e)}>Editar</Button>
-            <Button variant="danger" disabled={!this.state.userCanEdit}>Eliminar</Button>
+            <Mutation mutation={DELETE_TASK_FROM_TASKLIST_MUTATION}
+              onCompleted={({deleteTaskFromTasklist}) => {
+                // this.props.deleteTask({tasklistID: this.props.tasklistID, id: deleteTaskFromTasklist.id});
+                console.log('TAREA ELIMINADA: ', deleteTaskFromTasklist.id, deleteTaskFromTasklist.name);
+              }}>
+              {(deleteTaskFromTasklist, {data}) => (
+            <Button variant="danger" disabled={!this.state.userCanEdit} onClick={(e) => this.handleDeleteTaskButton(t.id, deleteTaskFromTasklist, e)}>Eliminar</Button>
+            )}
+            </Mutation>
           </InputGroup.Append>
         </InputGroup>
       </ListGroup.Item>

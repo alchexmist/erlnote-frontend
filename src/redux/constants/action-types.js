@@ -7,6 +7,7 @@ export const UPDATE_BOARDS = 'UPDATE_BOARDS';
 export const ADD_NEW_BOARD = 'ADD_NEW_BOARD';
 export const ADD_NEW_TASK = 'ADD_NEW_TASK';
 export const UPDATE_TASK = 'UPDATE_TASK';
+export const DELETE_TASK = 'DELETE_TASK';
 export const UPDATE_TASKLIST = 'UPDATE_TASKLIST';
 export const ADD_TAG_TASKLIST = 'ADD_TAG_TASKLIST';
 export const REMOVE_TAG_TASKLIST = 'REMOVE_TAG_TASKLIST';

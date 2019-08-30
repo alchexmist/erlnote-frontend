@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import {connect} from 'react-redux';
 import EditTasklist from '../components/EditTasklist';
-import {setUserAction, updateTasklist, deleteTasklist, addNewTask, updateTask, addTagTasklist, removeTagTasklist} from '../redux/actions/index';
+import {setUserAction, updateTasklist, deleteTasklist, addNewTask, updateTask, deleteTask, addTagTasklist, removeTagTasklist} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -35,6 +35,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     updateTask: (taskDataObject) => {
       dispatch(updateTask(taskDataObject));
+    },
+    deleteTask: (taskDataObject) => {
+      dispatch(deleteTask(taskDataObject));
     },
     addTagTasklist: (tagDataObject) => {
       dispatch(addTagTasklist(tagDataObject));

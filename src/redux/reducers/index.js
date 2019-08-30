@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -85,6 +85,17 @@ function rootReducer(state = initialState, action) {
 
         return newState;
       };
+    case DELETE_TASK:
+      const newStateDeleteTask = Object.assign({}, state);
+      const deleteTaskTasklistIndex = newStateDeleteTask.tasklists.findIndex((t) => t.id == action.taskDataObject.tasklistID);
+      if (deleteTaskTasklistIndex === -1) {
+        return newStateDeleteTask;
+      }
+      const deleteTaskIndex = newStateDeleteTask.tasklists[deleteTaskTasklistIndex].tasks.findIndex((t) => t.id == action.taskDataObject.id);
+      if (deleteTaskIndex !== -1) {
+        newStateDeleteTask.tasklists[deleteTaskTasklistIndex].tasks.splice(deleteTaskIndex, 1);
+      }
+      return newStateDeleteTask;
     case UPDATE_BOARD:
       return Object.assign(
           {},
@@ -116,13 +127,13 @@ function rootReducer(state = initialState, action) {
             tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
           }
       );
-      case DELETE_TASKLIST:
-        const newStateDeleteTasklist = Object.assign({}, state);
-        const deleteTasklistIndex = newStateDeleteTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.tasklistID);
-        if (deleteTasklistIndex !== -1) {
-          newStateDeleteTasklist.tasklists.splice(deleteTasklistIndex, 1);
-        }
-        return newStateDeleteTasklist;
+    case DELETE_TASKLIST:
+      const newStateDeleteTasklist = Object.assign({}, state);
+      const deleteTasklistIndex = newStateDeleteTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.tasklistID);
+      if (deleteTasklistIndex !== -1) {
+        newStateDeleteTasklist.tasklists.splice(deleteTasklistIndex, 1);
+      }
+      return newStateDeleteTasklist;
     case ADD_TAG_TASKLIST:
       const newStateAddTagTasklist = Object.assign({}, state);
       const addTagTasklistIndex = newStateAddTagTasklist.tasklists.findIndex((t) => t.id == action.tagDataObject.tasklistID);
