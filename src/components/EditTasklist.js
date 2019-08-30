@@ -120,6 +120,19 @@ const DELETE_TASK_FROM_TASKLIST_MUTATION = gql`
     }
   }`;
 
+const UPDATE_TASKLIST_ACCESS_MUTATION = gql`
+  mutation UpdateTasklistAccess($tasklistAccessData: UpdateTasklistAccessInput!) {
+    updateTasklistAccess(input: $tasklistAccessData) {
+      ... on TasklistAccessInfo {
+        ownerId
+        userId
+        canRead
+        canWrite
+        tasklistId
+      }
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -286,6 +299,16 @@ class EditTasklist extends Component {
     this.tasklistContributorInput.current.focus();
   }
 
+  handleUpdateTasklistAccessButton(updateTasklistAccess, e) {
+    updateTasklistAccess({variables: {'tasklistAccessData': {
+      'userName': this.state.addContributorTextfield,
+      'tasklistId': this.props.tasklistID,
+      'canRead': true,
+      'canWrite': this.state.readWriteRadioChecked,
+    }}});
+    this.tasklistContributorInput.current.focus();
+  }
+
   handleDeleteTasklistButton(deleteTasklistUser, e) {
     deleteTasklistUser({variables: {data: this.props.tasklistID}});
     this.props.deleteTasklist({tasklistID: this.props.tasklistID});
@@ -346,8 +369,8 @@ class EditTasklist extends Component {
                 console.log('TAREA ELIMINADA: ', deleteTaskFromTasklist.id, deleteTaskFromTasklist.name);
               }}>
               {(deleteTaskFromTasklist, {data}) => (
-            <Button variant="danger" disabled={!this.state.userCanEdit} onClick={(e) => this.handleDeleteTaskButton(t.id, deleteTaskFromTasklist, e)}>Eliminar</Button>
-            )}
+                <Button variant="danger" disabled={!this.state.userCanEdit} onClick={(e) => this.handleDeleteTaskButton(t.id, deleteTaskFromTasklist, e)}>Eliminar</Button>
+              )}
             </Mutation>
           </InputGroup.Append>
         </InputGroup>
@@ -369,21 +392,21 @@ class EditTasklist extends Component {
     return (
       <Container className="my-3">
         <Form>
-        <Query query={GET_TASKLIST_ACCESS_INFO_QUERY}
-          variables={{entityId: this.props.match.params.id}}
-          fetchPolicy={'cache-and-network'}
-          onCompleted={({getAccessInfo}) => {
-            console.log('QUERY RESULT: ', getAccessInfo.canWrite);
-            this.setState({userCanEdit: getAccessInfo.canWrite});
-          }}
-        >
-          {({loading, error, data}) => {
-            if (loading) return null;
-            if (error) return null;
+          <Query query={GET_TASKLIST_ACCESS_INFO_QUERY}
+            variables={{entityId: this.props.match.params.id}}
+            fetchPolicy={'cache-and-network'}
+            onCompleted={({getAccessInfo}) => {
+              console.log('QUERY RESULT: ', getAccessInfo.canWrite);
+              this.setState({userCanEdit: getAccessInfo.canWrite});
+            }}
+          >
+            {({loading, error, data}) => {
+              if (loading) return null;
+              if (error) return null;
 
-            return null;
-          }}
-        </Query>
+              return null;
+            }}
+          </Query>
           <Mutation mutation={UPDATE_TASKLIST_MUTATION}
             onCompleted={({tasklist}) => {
               this.props.updateTasklist({id: tasklist.id, title: tasklist.title, tasks: tasklist.tasks, tags: tasklist.tags, __typename: 'Tasklist'});
@@ -477,6 +500,15 @@ class EditTasklist extends Component {
                             <Dropdown.Item onClick={(e) => this.handleDeleteContributorButton(deleteTasklistContributor, e)}>Eliminar</Dropdown.Item>
                           )}
                         </Mutation>
+                        <Mutation mutation={UPDATE_TASKLIST_ACCESS_MUTATION}
+                          onCompleted={({updateTasklistAccess}) => {
+                            console.log('UPDATE TASKLIST ACCESS: ', updateTasklistAccess.userId, updateTasklistAccess.tasklistId, updateTasklistAccess.canWrite);
+                            this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                          }}>
+                          {(updateTasklistAccess, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleUpdateTasklistAccessButton(updateTasklistAccess, e)}>Actualizar permisos</Dropdown.Item>
+                          )}
+                        </Mutation>
                       </Dropdown.Menu>
                     </Dropdown>
                   </Col>
@@ -523,14 +555,14 @@ class EditTasklist extends Component {
               <Container className="mb-5">
                 <Row className="justify-content-center">
                   <Col xs lg md sm xl="4">
-                  <Mutation mutation={DELETE_TASKLIST_MUTATION}
-                          onCompleted={({deleteTasklistUser}) => {
-                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteTasklistUser.id, deleteTasklistUser.title);
-                          }}>
-                          {(deleteTasklistUser, {data}) => (
-                    <Button variant='danger' onClick={(e) => this.handleDeleteTasklistButton(deleteTasklistUser, e)}>Eliminar lista de tareas</Button>
-                    )}
-                        </Mutation>
+                    <Mutation mutation={DELETE_TASKLIST_MUTATION}
+                      onCompleted={({deleteTasklistUser}) => {
+                        console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteTasklistUser.id, deleteTasklistUser.title);
+                      }}>
+                      {(deleteTasklistUser, {data}) => (
+                        <Button variant='danger' onClick={(e) => this.handleDeleteTasklistButton(deleteTasklistUser, e)}>Eliminar lista de tareas</Button>
+                      )}
+                    </Mutation>
                   </Col>
                 </Row>
               </Container>
