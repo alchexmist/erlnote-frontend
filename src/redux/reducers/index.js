@@ -120,13 +120,19 @@ function rootReducer(state = initialState, action) {
           }
       );
     case UPDATE_TASKLIST:
-      return Object.assign(
-          {},
-          state,
-          {
-            tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
-          }
-      );
+      const newStateUpdateTasklist = Object.assign({}, state);
+      const updateTasklistIndex = newStateUpdateTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.id);
+      if (updateTasklistIndex !== -1) {
+        newStateUpdateTasklist.tasklists.splice(updateTasklistIndex, 1, action.tasklistDataObject);
+      }
+      return newStateUpdateTasklist;
+      // return Object.assign(
+      //     {},
+      //     state,
+      //     {
+      //       tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
+      //     }
+      // );
     case DELETE_TASKLIST:
       const newStateDeleteTasklist = Object.assign({}, state);
       const deleteTasklistIndex = newStateDeleteTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.tasklistID);

@@ -33,6 +33,7 @@ const UPDATE_TASKLIST_MUTATION = gql`
         id
         name
       }
+      updatedBy
     }
   }`;
 
@@ -133,6 +134,28 @@ const UPDATE_TASKLIST_ACCESS_MUTATION = gql`
     }
   }`;
 
+const TASKLIST_UPDATED_SUBSCRIPTION = gql`
+  subscription TasklistUpdated($tasklistId: ID!) {
+    tasklistUpdated(tasklistId: $tasklistId) {
+      id
+      title
+      tasks {
+        id
+        name
+        description
+        state
+        priority
+        startDatetime
+        endDatetime
+      }
+      tags {
+        id
+        name
+      }
+      updatedBy
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -187,33 +210,32 @@ class EditTasklist extends Component {
   }
 
   handleTitleChange(updateTasklist, e) {
-    let newTitle;
-    let withTitle = true;
-
-    if (e.target.value.length > 0) {
-      newTitle = fixAccentMark(e.target.value);
-    } else {
-      newTitle = '<Sin título>';
-      withTitle = false;
-    }
-    // const newTitle = fixAccentMark(e.target.value);
+    const newTitle = (e.target.value.length > 0) ? fixAccentMark(e.target.value) : '<Sin título>';
     const cursorStart = e.target.selectionStart;
 
     this.setMoreMutations();
 
     this.tasklistTitleInput.current.value = newTitle;
-    if (withTitle) {
-      this.tasklistTitleInput.current.selectionStart = this.tasklistTitleInput.current.selectionEnd = cursorStart;
-    } else {
-      this.tasklistTitleInput.current.selectionStart = cursorStart;
-      this.tasklistTitleInput.current.selectionEnd = newTitle.length;
-    }
+    this.tasklistTitleInput.current.selectionStart = this.tasklistTitleInput.current.selectionEnd = cursorStart;
     this.setState({titleCursorOffset: cursorStart});
 
     updateTasklist({variables: {tasklistData: {
       'tasklistId': this.props.tasklistID,
       'title': newTitle,
     }}});
+    // let withTitle = true;
+
+    // if (e.target.value.length > 0) {
+    //   newTitle = fixAccentMark(e.target.value);
+    // } else {
+    //   newTitle = '<Sin título>';
+    //   withTitle = false;
+    // }
+    // if (withTitle) {
+    // } else {
+    //   this.tasklistTitleInput.current.selectionStart = cursorStart;
+    //   this.tasklistTitleInput.current.selectionEnd = newTitle.length;
+    // }
   }
 
   handleAddTaskButton(addTaskToTasklist, e) {
@@ -392,6 +414,21 @@ class EditTasklist extends Component {
     return (
       <Container className="my-3">
         <Form>
+          <Subscription
+            subscription={TASKLIST_UPDATED_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.tasklistUpdated;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.updateTasklist({id: data.id, title: data.title, tasks: data.tasks, tags: data.tags, __typename: 'Tasklist'});
+                this.tasklistTitleInput.current.value = data.title;
+                this.tasklistTitleInput.current.selectionStart = this.tasklistTitleInput.current.selectionEnd = this.state.titleCursorOffset;
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
           <Query query={GET_TASKLIST_ACCESS_INFO_QUERY}
             variables={{entityId: this.props.match.params.id}}
             fetchPolicy={'cache-and-network'}
@@ -417,7 +454,7 @@ class EditTasklist extends Component {
                 <InputGroup.Prepend>
                   <InputGroup.Text>Título</InputGroup.Text>
                 </InputGroup.Prepend>
-                <Form.Control ref={this.tasklistTitleInput} disabled={!this.state.userCanEdit} size="lg" type="text" placeholder="Título de la lista de tareas" defaultValue={(this.props.tasklistTitle !== null) ? this.props.tasklistTitle : ''} onChange={(e) => this.handleTitleChange(updateTasklist, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
+                <Form.Control ref={this.tasklistTitleInput} disabled={!this.state.userCanEdit} size="lg" type="text" placeholder="Título de la lista de tareas" defaultValue={(this.props.tasklistTitle !== null) ? this.props.tasklistTitle : 'No ha sido posible obtener el título'} onChange={(e) => this.handleTitleChange(updateTasklist, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
               </InputGroup>
             )}
           </Mutation>
