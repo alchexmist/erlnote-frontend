@@ -60,6 +60,7 @@ const UPDATE_TASK_IN_TASKLIST_MUTATION = gql`
         priority
         startDatetime
         endDatetime
+        tasklistId
     }
   }`;
 
@@ -215,6 +216,7 @@ class EditTasklist extends Component {
 
     this.setMoreMutations();
 
+    console.log('TITLE REF: ', this.tasklistTitleInput);
     this.tasklistTitleInput.current.value = newTitle;
     this.tasklistTitleInput.current.selectionStart = this.tasklistTitleInput.current.selectionEnd = cursorStart;
     this.setState({titleCursorOffset: cursorStart});
@@ -236,6 +238,31 @@ class EditTasklist extends Component {
     //   this.tasklistTitleInput.current.selectionStart = cursorStart;
     //   this.tasklistTitleInput.current.selectionEnd = newTitle.length;
     // }
+  }
+
+  handleTaskNameChange(t, updateTaskInTasklist, e) {
+    const currentLenGTZero = (e.target.value.length > 0) ? true : false;
+    const newName = (currentLenGTZero) ? fixAccentMark(e.target.value) : '<Sin título>';
+    const cursorStart = e.target.selectionStart;
+
+    this.setMoreMutations();
+
+    this[`taskTextfieldItemRef${t.id}`].value = newName;
+    if (currentLenGTZero) {
+      this[`taskTextfieldItemRef${t.id}`].selectionStart = this[`taskTextfieldItemRef${t.id}`].selectionEnd = cursorStart;
+    } else {
+      this[`taskTextfieldItemRef${t.id}`].selectionStart = 0;
+      this[`taskTextfieldItemRef${t.id}`].selectionEnd = 12;
+    }
+    this.setState({[`taskTextfieldItemRef${t.id}CursorOffset`]: cursorStart});
+
+    updateTaskInTasklist({variables: {taskData: {
+      'id': t.id,
+      'tasklistId': this.props.tasklistID,
+      'name': newName,
+      'state': t.state,
+      'priority': t.priority,
+    }}});
   }
 
   handleAddTaskButton(addTaskToTasklist, e) {
@@ -354,14 +381,32 @@ class EditTasklist extends Component {
             <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
               onCompleted={({task}) => {
                 this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
-                console.log('ESTADO DE LA TAREA RESULTADO DE MUTACIÓN: ', task.state);
+                console.log('ESTADO DE LA TAREA RESULTADO DE MUTACIÓN: ', task.state, task.tasklistId);
               }}>
               {(updateTaskInTasklist, {data}) => (
                 <InputGroup.Checkbox key={t.id} disabled={!this.state.userCanEdit} aria-label="Marcar tarea como finalizada" checked={(t.state === TASK_STATE_FINISHED) ? true : false} onChange={(e) => this.handleFinishedTaskCheckbox(updateTaskInTasklist, t, e)} />
               )}
             </Mutation>
           </InputGroup.Prepend>
-          <Form.Control ref={(input) => {this[`taskTextfieldItemRef${t.id}`] = input;}} disabled={!this.state.userCanEdit} className="mx-1" plaintext aria-label={t.name} key={t.id} style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}} defaultValue={t.name} />
+          <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
+            onCompleted={({task}) => {
+              this.props.updateTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
+              console.log('NOMBRE DE LA TAREA RESULTADO DE MUTACIÓN: ', task.name);
+            }}>
+            {(updateTaskInTasklist, {data}) => (
+              <Form.Control ref={(input) => {this[`taskTextfieldItemRef${t.id}`] = input;}}
+                disabled={!this.state.userCanEdit}
+                className="mx-1"
+                type="text"
+                plaintext
+                aria-label={t.name}
+                key={t.id}
+                style={(t.state === TASK_STATE_FINISHED) ? {'textDecoration': 'line-through'} : {'textDecoration': 'initial'}}
+                defaultValue={t.name}
+                onChange={(e) => this.handleTaskNameChange(t, updateTaskInTasklist, e)}
+                onClick={(e) => this.setState({[`taskTextfieldItemRef${t.id}CursorOffset`]: e.target.selectionStart})} />
+            )}
+          </Mutation>
           <InputGroup.Append>
             <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
               onCompleted={({task}) => {
