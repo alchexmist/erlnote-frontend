@@ -43,7 +43,7 @@ class Boards extends Component {
 
   parseBoardData(boardData) {
     return (
-      <Card as="a" key={boardData.id} onClick={(e) => this.handleBoardCardClick(boardData.id, e)} style={{cursor: 'pointer'}}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>
+      <Card as="a" key={boardData.id} onClick={(e) => this.handleBoardCardClick(boardData.id, e)} style={{'cursor': 'pointer', 'maxWidth': 400, 'overflowX': 'auto', 'maxHeight': 400, 'overflowY': 'auto'}}><Card.Body><Card.Title>{boardData.title}</Card.Title><Card.Text>{boardData.text}</Card.Text></Card.Body></Card>
     );
   }
 

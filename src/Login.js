@@ -50,6 +50,11 @@ export default class Login extends Component {
     };
   }
 
+  handleReset(e) {
+    e.preventDefault();
+    this.setState({email: '', password: '', loginFailed: ''});
+  }
+
   render() {
     const {redirectToDashboard} = this.state;
 
@@ -57,7 +62,8 @@ export default class Login extends Component {
       return <Redirect to='/dashboard' />;
     }
 
-    const style = {loginLabel: {'color': 'white', 'backgroundColor': 'rgb(53, 58, 63)'}};
+    // const style = {loginLabel: {'color': 'while', 'backgroundColor': 'rgb(53, 58, 63)'}};
+    const style = {loginLabel: {'color': 'black', 'fontSize': 'large'}};
     return (
       // <Container className="d-flex flex-column justify-content-between h-100" fluid="true">
       <Container className="d-flex flex-column justify-content-between p-0" fluid="true">
@@ -67,14 +73,14 @@ export default class Login extends Component {
               <Form.Group controlId="formBasicEmail">
                 <Form.Label style={style.loginLabel}>Correo electrónico</Form.Label>
                 <Form.Control size="lg" type="email" placeholder="Introduzca su dirección de correo" autoComplete="email" value={this.state.email} onChange={(e) => this.setState({email: e.target.value})} />
-                <Form.Text className="text-muted">
+                <Form.Text className="text-muted" style={{'color': 'black', 'fontWeight': 'bold'}}>
                   Nunca compartiremos tu dirección de correo electrónico con nadie.
                 </Form.Text>
               </Form.Group>
 
               <Form.Group controlId="formBasicPassword" >
                 <Form.Label style={style.loginLabel}>Contraseña</Form.Label>
-                <Form.Control size="lg" type="password" placeholder="Contraseña" autoComplete="current-password" value={this.state.password} onChange={(e) => this.setState({password: e.target.value})} />
+                <Form.Control size="lg" type="password" placeholder="Introduzca su contraseña" autoComplete="current-password" value={this.state.password} onChange={(e) => this.setState({password: e.target.value})} />
                 <LoginFailed isLoggedIn={this.state.loginFailed} />
               </Form.Group>
               {/* <Container className="d-flex flex-row justify-content-end" fluid="true">
@@ -110,7 +116,7 @@ export default class Login extends Component {
                   </Button>
                 )}
               </Mutation>
-              <Button block variant="dark" size="lg" type="reset">
+              <Button block variant="dark" size="lg" type="reset" onClick={(e) => this.handleReset(e)}>
                 Restablecer
               </Button>
             </Form>
