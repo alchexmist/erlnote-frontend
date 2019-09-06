@@ -157,6 +157,21 @@ const TASKLIST_UPDATED_SUBSCRIPTION = gql`
     }
   }`;
 
+const TASK_UPDATED_SUBSCRIPTION = gql`
+  subscription TaskUpdated($tasklistId: ID!, $taskId: ID!) {
+    taskUpdated(tasklistId: $tasklistId, taskId: $taskId) {
+        id
+        name
+        description
+        state
+        priority
+        startDatetime
+        endDatetime
+        tasklistId
+        updatedBy
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -407,6 +422,21 @@ class EditTasklist extends Component {
                 onClick={(e) => this.setState({[`taskTextfieldItemRef${t.id}CursorOffset`]: e.target.selectionStart})} />
             )}
           </Mutation>
+          <Subscription
+            subscription={TASK_UPDATED_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID, taskId: t.id}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.taskUpdated;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.updateTask({tasklistID: this.props.tasklistID, id: data.id, name: data.name, description: data.description, state: data.state, priority: data.priority, startDatetime: data.startDatetime, endDatetime: data.endDatetime, __typename: 'Task'});
+                this[`taskTextfieldItemRef${t.id}`].value = data.name;
+                this[`taskTextfieldItemRef${t.id}`].selectionStart = this[`taskTextfieldItemRef${t.id}`].selectionEnd = this.state[`taskTextfieldItemRef${t.id}CursorOffset`];
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
           <InputGroup.Append>
             <Mutation mutation={UPDATE_TASK_IN_TASKLIST_MUTATION}
               onCompleted={({task}) => {
