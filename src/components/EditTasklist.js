@@ -172,6 +172,16 @@ const TASK_UPDATED_SUBSCRIPTION = gql`
     }
   }`;
 
+const TASKLIST_TAG_CREATED_SUBSCRIPTION = gql`
+  subscription TasklistTagCreated($tasklistId: ID!) {
+    tasklistTagCreated(tasklistId: $tasklistId) {
+        id
+        name
+        tasklistId
+        updatedBy
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -725,6 +735,20 @@ class EditTasklist extends Component {
     Dark
             </Badge> */}
           </Form.Row>
+          <Subscription
+            subscription={TASKLIST_TAG_CREATED_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.tasklistTagCreated;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.addTagTasklist({tasklistID: this.props.tasklistID, id: data.id, name: data.name});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
         </Form>
       </Container>
     );
