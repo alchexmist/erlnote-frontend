@@ -47,6 +47,7 @@ const ADD_TASK_TO_TASKLIST_MUTATION = gql`
         priority
         startDatetime
         endDatetime
+        tasklistId
     }
   }`;
 
@@ -119,6 +120,7 @@ const DELETE_TASK_FROM_TASKLIST_MUTATION = gql`
     deleteTaskFromTasklist(taskId: $taskId, tasklistId: $tasklistId) {
       id
       name
+      tasklistId
     }
   }`;
 
@@ -179,6 +181,45 @@ const TASKLIST_TAG_CREATED_SUBSCRIPTION = gql`
         name
         tasklistId
         updatedBy
+    }
+  }`;
+
+const TASKLIST_TAG_DELETED_SUBSCRIPTION = gql`
+  subscription TasklistTagDeleted($tasklistId: ID!) {
+    tasklistTagDeleted(tasklistId: $tasklistId) {
+        msg
+        entityId
+        updatedBy
+    }
+  }`;
+
+const NEW_TASK_IN_TASKLIST_SUBSCRIPTION = gql`
+  subscription NewTaskInTasklist($tasklistId: ID!) {
+    newTaskInTasklist(tasklistId: $tasklistId) {
+      id
+      name
+      description
+      state
+      priority
+      startDatetime
+      endDatetime
+      tasklistId
+      updatedBy
+    }
+  }`;
+
+const DELETED_TASK_IN_TASKLIST_SUBSCRIPTION = gql`
+  subscription DeletedTaskInTasklist($tasklistId: ID!) {
+    deletedTaskInTasklist(tasklistId: $tasklistId) {
+      id
+      name
+      description
+      state
+      priority
+      startDatetime
+      endDatetime
+      tasklistId
+      updatedBy
     }
   }`;
 
@@ -473,7 +514,7 @@ class EditTasklist extends Component {
             <Mutation mutation={DELETE_TASK_FROM_TASKLIST_MUTATION}
               onCompleted={({deleteTaskFromTasklist}) => {
                 // this.props.deleteTask({tasklistID: this.props.tasklistID, id: deleteTaskFromTasklist.id});
-                console.log('TAREA ELIMINADA: ', deleteTaskFromTasklist.id, deleteTaskFromTasklist.name);
+                console.log('TAREA ELIMINADA: ', deleteTaskFromTasklist.id, deleteTaskFromTasklist.name, deleteTaskFromTasklist.tasklistId);
               }}>
               {(deleteTaskFromTasklist, {data}) => (
                 <Button variant="danger" disabled={!this.state.userCanEdit} onClick={(e) => this.handleDeleteTaskButton(t.id, deleteTaskFromTasklist, e)}>Eliminar</Button>
@@ -547,6 +588,7 @@ class EditTasklist extends Component {
             <Tab eventKey="tasklist-new-task" title="Nueva Tarea">
               <Mutation mutation={ADD_TASK_TO_TASKLIST_MUTATION}
                 onCompleted={({task}) => {
+                  console.log('TASKLIST ID OF THE TASK: ', task.tasklistId);
                   this.props.addTask({tasklistID: this.props.tasklistID, id: task.id, name: task.name, description: task.description, state: task.state, priority: task.priority, startDatetime: task.startDatetime, endDatetime: task.endDatetime, __typename: 'Task'});
                   this.setState({newTaskName: ''});
                   this.newTaskTextField.current.focus();
@@ -660,7 +702,7 @@ class EditTasklist extends Component {
                       <Dropdown.Menu>
                         <Mutation mutation={REMOVE_TAG_FROM_TASKLIST_MUTATION}
                           onCompleted={({removeTagFromTasklist}) => {
-                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', removeTagFromTasklist.msg);
+                            // console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', removeTagFromTasklist.msg);
                             this.setState({addTagTextfield: ''});
                           }}>
                           {(removeTagFromTasklist, {data}) => (
@@ -743,6 +785,48 @@ class EditTasklist extends Component {
               if (data.updatedBy !== this.props.currentUserID) {
                 console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
                 this.props.addTagTasklist({tasklistID: this.props.tasklistID, id: data.id, name: data.name});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
+          <Subscription
+            subscription={TASKLIST_TAG_DELETED_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.tasklistTagDeleted;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.removeTagTasklist({tasklistID: this.props.tasklistID, name: data.msg});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
+          <Subscription
+            subscription={NEW_TASK_IN_TASKLIST_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.newTaskInTasklist;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.addTask({tasklistID: this.props.tasklistID, id: data.id, name: data.name, description: data.description, state: data.state, priority: data.priority, startDatetime: data.startDatetime, endDatetime: data.endDatetime, __typename: 'Task'});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
+          <Subscription
+            subscription={DELETED_TASK_IN_TASKLIST_SUBSCRIPTION}
+            variables={{tasklistId: this.props.tasklistID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.deletedTaskInTasklist;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.deleteTask({tasklistID: this.props.tasklistID, id: data.id});
                 this.setState({state: this.state});
               } else {
                 console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
