@@ -1,10 +1,9 @@
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
-import {Navbar, NavDropdown, Nav, Form, FormControl, Button, Container, Row, Col, CardColumns, Card} from 'react-bootstrap';
+import {Badge, Container, CardColumns, Card} from 'react-bootstrap';
 import gql from 'graphql-tag';
 import {Query} from 'react-apollo';
-import { ACTION_EDIT_BOARD } from '../redux/constants/action-types';
 import {Redirect} from 'react-router-dom';
 import {ACTION_EDIT_NOTE} from '../redux/constants/action-types';
 
@@ -36,23 +35,29 @@ const GET_NOTES = gql`
 class Notes extends Component {
   constructor(props) {
     super(props);
-
-    // this.state = {
-
-    // };
   }
-
-  // componentDidMount() {
-  //   <Notes />;
-  // }
 
   handleNoteCardClick(noteID, e) {
     this.props.setUserAction({userActionName: ACTION_EDIT_NOTE, actionEntityID: noteID});
   }
 
+  parseTagData(tagData) {
+    return (
+      <Badge key={tagData.id} className="mr-1" pill variant="primary">{tagData.name}</Badge>
+    );
+  }
+
   parseNoteData(noteData) {
     return (
-      <Card key={noteData.id} style={{'cursor': 'pointer', 'maxWidth': 400, 'overflowX': 'auto', 'maxHeight': 400, 'overflowY': 'auto'}} onClick={(e) => this.handleNoteCardClick(noteData.id, e)} ><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>
+      <Card key={noteData.id} style={{'cursor': 'pointer', 'maxWidth': 400, 'overflowX': 'auto', 'maxHeight': 400, 'overflowY': 'auto'}} onClick={(e) => this.handleNoteCardClick(noteData.id, e)} >
+        <Card.Body>
+          <Card.Title>{noteData.title}</Card.Title>
+          <Card.Text>{noteData.body}</Card.Text>
+        </Card.Body>
+        <Card.Footer>
+          {noteData.tags.map((t) => this.parseTagData(t))}
+        </Card.Footer>
+      </Card>
     );
   }
 
