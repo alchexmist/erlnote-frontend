@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -61,6 +61,14 @@ function rootReducer(state = initialState, action) {
           state,
           {
             tasklists: [...state.tasklists.slice(), {id: action.id, title: action.title, tasks: action.tasks, tags: action.tags, __typename: action.__typename}],
+          }
+      );
+    case ADD_NEW_NOTE:
+      return Object.assign(
+          {},
+          state,
+          {
+            notes: [...state.notes.slice(), {id: action.id, title: action.title, body: action.body, tags: action.tags, __typename: action.__typename}],
           }
       );
     case ADD_NEW_TASK:

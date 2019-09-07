@@ -4,7 +4,7 @@
 import React, {Component} from 'react';
 import {Navbar, NavDropdown, Nav, Button, Container} from 'react-bootstrap';
 import {ENTITY_VISIBLE_ID_NOTES, ENTITY_VISIBLE_ID_BOARDS, ENTITY_VISIBLE_ID_TASKLISTS} from '../redux/constants/action-types';
-import {ACTION_CREATE_BOARD, ACTION_CREATE_TASKLIST} from '../redux/constants/action-types';
+import {ACTION_CREATE_BOARD, ACTION_CREATE_TASKLIST, ACTION_CREATE_NOTE} from '../redux/constants/action-types';
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import gql from 'graphql-tag';
 import {Mutation} from 'react-apollo';
@@ -23,6 +23,19 @@ mutation CreateTasklist {
   tasklist: createTasklist {
     id
     title
+  }
+}`;
+
+const CREATE_NOTE_MUTATION = gql`
+mutation CreateNote {
+  note: createNote {
+    id
+    title
+    body
+    tags {
+      id
+      name
+    }
   }
 }`;
 
@@ -51,6 +64,11 @@ export default class MainBar extends Component {
     this.props.setUserAction({userActionName: userActionName, actionEntityID: tasklistData.tasklistID});
   }
 
+  handleCreateNoteClick(userActionName, noteData) {
+    this.props.addNewNote(noteData);
+    this.props.setUserAction({userActionName: userActionName, actionEntityID: noteData.noteID});
+  }
+
   render() {
     if (this.props.userAction === ACTION_CREATE_BOARD) {
       return <Redirect to={'/edit/board/' + this.props.userActionEntityID} />;
@@ -58,6 +76,10 @@ export default class MainBar extends Component {
     if (this.props.userAction === ACTION_CREATE_TASKLIST) {
       return <Redirect to={'/edit/tasklist/' + this.props.userActionEntityID} />;
     }
+    if (this.props.userAction === ACTION_CREATE_NOTE) {
+      return <Redirect to={'/edit/note/' + this.props.userActionEntityID} />;
+    }
+
     return (
       <Container className="p-0" fluid="true">
         <Navbar variant="dark" bg="dark" expand="xl" >
@@ -86,7 +108,20 @@ export default class MainBar extends Component {
               )}
             </Mutation>
             }
-            {this.props.entityVisible == ENTITY_VISIBLE_ID_NOTES &&<Button variant="outline-info">Crear nota</Button>}
+            {this.props.entityVisible == ENTITY_VISIBLE_ID_NOTES &&
+            <Mutation mutation={CREATE_NOTE_MUTATION}
+              onCompleted={({note}) => {
+                console.log('Note ID: ', note.id);
+                console.log('Note Title: ', note.title);
+                console.log('Note Body: ', note.body);
+                console.log('Note Tags: ', note.tags);
+                this.handleCreateNoteClick(ACTION_CREATE_NOTE, {noteID: note.id, noteTitle: note.title, noteBody: note.body, noteTags: note.tags});
+              }}>
+              {(createNote, {data}) => (
+                <Button variant="outline-info" onClick={() => createNote()}>Crear nota</Button>
+              )}
+            </Mutation>
+            }
             {/* {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&<Button variant="outline-info" onClick={() => this.handleCreateBoardClick(ACTION_CREATE_BOARD)} >Crear pizarra</Button>} */}
             {this.props.entityVisible == ENTITY_VISIBLE_ID_BOARDS &&
               <Mutation mutation={CREATE_BOARD_MUTATION}

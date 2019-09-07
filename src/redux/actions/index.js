@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
 
 
 export function logout() {
@@ -61,6 +61,10 @@ export function addNewBoard(boardData) {
 
 export function addNewTasklist(tasklistData) {
   return {type: ADD_NEW_TASKLIST, id: tasklistData.tasklistID, title: tasklistData.tasklistTitle, tasks: tasklistData.tasklistTasks, tags: tasklistData.tasklistTags, __typename: 'Tasklist'};
+}
+
+export function addNewNote(noteData) {
+  return {type: ADD_NEW_NOTE, id: noteData.noteID, title: noteData.noteTitle, body: noteData.noteBody, tags: noteData.noteTags, __typename: 'Note'};
 }
 
 export function addNewTask(taskDataObject) {

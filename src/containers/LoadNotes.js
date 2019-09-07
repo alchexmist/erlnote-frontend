@@ -1,11 +1,13 @@
 import {connect} from 'react-redux';
 import Notes from '../components/Notes';
-import {updateNotes} from '../redux/actions/index';
+import {setUserAction, updateNotes} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
   return {
-    entityVisible: state.entityVisible,
+    userAction: state.userAction,
+    userActionEntityID: state.userActionEntityID,
+    // entityVisible: state.entityVisible,
     notes: state.notes,
   };
 };
@@ -14,6 +16,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     noteListRequest: (noteList) => {
       dispatch(updateNotes(noteList));
+    },
+    setUserAction: (userAction) => {
+      dispatch(setUserAction(userAction));
     },
   };
 };

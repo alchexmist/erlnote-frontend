@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import {Query} from 'react-apollo';
 import { ACTION_EDIT_BOARD } from '../redux/constants/action-types';
 import {Redirect} from 'react-router-dom';
+import {ACTION_EDIT_NOTE} from '../redux/constants/action-types';
 
 const GET_NOTES = gql`
   {
@@ -14,11 +15,19 @@ const GET_NOTES = gql`
           id
           title
           body
+          tags {
+            id
+            name
+          }
         }
         contributorNotes {
           id
           title
           body
+          tags {
+            id
+            name
+          } 
         }
       } 
   }
@@ -37,13 +46,21 @@ class Notes extends Component {
   //   <Notes />;
   // }
 
+  handleNoteCardClick(noteID, e) {
+    this.props.setUserAction({userActionName: ACTION_EDIT_NOTE, actionEntityID: noteID});
+  }
+
   parseNoteData(noteData) {
     return (
-      <Card key={noteData.id}><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>
+      <Card key={noteData.id} style={{'cursor': 'pointer', 'maxWidth': 400, 'overflowX': 'auto', 'maxHeight': 400, 'overflowY': 'auto'}} onClick={(e) => this.handleNoteCardClick(noteData.id, e)} ><Card.Body><Card.Title>{noteData.title}</Card.Title><Card.Text>{noteData.body}</Card.Text></Card.Body></Card>
     );
   }
 
   render() {
+    if (this.props.userAction === ACTION_EDIT_NOTE) {
+      return <Redirect push to={'/edit/note/' + this.props.userActionEntityID} />;
+    }
+
     return (
       <Container className="mx-auto my-3">
         <Query query={GET_NOTES}

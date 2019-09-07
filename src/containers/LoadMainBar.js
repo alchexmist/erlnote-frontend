@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 import {connect} from 'react-redux';
 import MainBar from '../components/MainBar';
-import {updateEntityVisible, setUserAction, addNewBoard, addNewTasklist} from '../redux/actions/index';
+import {updateEntityVisible, setUserAction, addNewBoard, addNewTasklist, addNewNote} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -24,6 +25,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     addNewTasklist: (tasklistData) => {
       dispatch(addNewTasklist(tasklistData));
+    },
+    addNewNote: (noteData) => {
+      dispatch(addNewNote(noteData));
     },
   };
 };
