@@ -47,6 +47,33 @@ const GET_NOTE_ACCESS_INFO_QUERY = gql`
     }
   }`;
 
+const ADD_NOTE_CONTRIBUTOR_MUTATION = gql`
+  mutation AddNoteContributor($data: AddNoteContributorFilter!) {
+    addNoteContributor(filter: $data) {
+      msg
+    }
+  }`;
+
+const DELETE_NOTE_CONTRIBUTOR_MUTATION = gql`
+  mutation DeleteNoteContributor($data: DeleteNoteContributorFilter!) {
+    deleteNoteContributor(filter: $data) {
+      msg
+    }
+  }`;
+
+const UPDATE_NOTE_ACCESS_MUTATION = gql`
+  mutation UpdateNoteAccess($noteAccessData: UpdateNoteAccessInput!) {
+    updateNoteAccess(input: $noteAccessData) {
+      ... on NoteAccessInfo {
+        ownerId
+        userId
+        canRead
+        canWrite
+        noteId
+      }
+    }
+  }`;
+
 class EditNote extends Component {
   constructor(props) {
     super(props);
@@ -55,9 +82,9 @@ class EditNote extends Component {
       titleCursorOffset: 0,
       //   newTaskName: '',
       //   addTagTextfield: '',
-      //   addContributorTextfield: '',
-      //   readWriteRadioChecked: true,
-      //   onlyReadRadioChecked: false,
+      addContributorTextfield: '',
+      readWriteRadioChecked: true,
+      onlyReadRadioChecked: false,
       userCanEdit: true,
     };
 
@@ -65,7 +92,7 @@ class EditNote extends Component {
     this.noteTitleInput = React.createRef();
     // this.newTaskTextField = React.createRef();
     // this.addTagButton = React.createRef();
-    // this.tasklistContributorInput = React.createRef();
+    this.noteContributorInput = React.createRef();
 
     this.moreMutations = false;
   }
@@ -106,6 +133,36 @@ class EditNote extends Component {
     }}});
   }
 
+  handleAddContributorButton(addNoteContributor, e) {
+    addNoteContributor({variables: {data: {
+      'type': 'USERNAME',
+      'value': this.state.addContributorTextfield,
+      'nid': this.props.noteID,
+      'canRead': true,
+      'canWrite': this.state.readWriteRadioChecked,
+    }}});
+    this.noteContributorInput.current.focus();
+  }
+
+  handleDeleteContributorButton(deleteNoteContributor, e) {
+    deleteNoteContributor({variables: {data: {
+      'type': 'USERNAME',
+      'value': this.state.addContributorTextfield,
+      'nid': this.props.noteID,
+    }}});
+    this.noteContributorInput.current.focus();
+  }
+
+  handleUpdateNoteAccessButton(updateNoteAccess, e) {
+    updateNoteAccess({variables: {'noteAccessData': {
+      'userName': this.state.addContributorTextfield,
+      'noteId': this.props.noteID,
+      'canRead': true,
+      'canWrite': this.state.readWriteRadioChecked,
+    }}});
+    this.noteContributorInput.current.focus();
+  }
+
   render() {
     //   {/* EL IDENTIFICADOR DE LA NOTA DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
@@ -141,6 +198,84 @@ class EditNote extends Component {
               </InputGroup>
             )}
           </Mutation>
+          <Tabs id="uncontrolled-tab-notes-actions" className="mt-5 mb-3" variant="pills">
+            <Tab eventKey="notes-contributors" disabled={!this.state.userCanEdit} title="Colaboradores">
+              <Container className="mb-5">
+                <Row className="justify-content-start">
+                  <Col xs lg md sm xl="4">
+                    <Form.Control ref={this.noteContributorInput} placeholder="Nombre de usuario" value={this.state.addContributorTextfield} onChange={(e) => this.setState({addContributorTextfield: e.target.value})}/>
+                  </Col>
+                  <Col xs lg md sm xl="2">
+                    <Form.Check
+                      custom
+                      inline
+                      label="Leer"
+                      type="radio"
+                      checked={this.state.onlyReadRadioChecked}
+                      onChange={(e) => {
+                        if (e.target.checked === true) {
+                          this.setState({onlyReadRadioChecked: true, readWriteRadioChecked: false});
+                        } else {
+                          this.setState({onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        }
+                      }}
+                      id="note-read-only"
+                    />
+
+                    <Form.Check
+                      custom
+                      inline
+                      label="Leer y editar"
+                      type="radio"
+                      checked={this.state.readWriteRadioChecked}
+                      onChange={(e) => {
+                        if (e.target.checked === true) {
+                          this.setState({onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        } else {
+                          this.setState({onlyReadRadioChecked: true, readWriteRadioChecked: false});
+                        }
+                      }}
+                      id="note-read-write"
+                    />
+                  </Col>
+                  <Col xs lg md sm xl="2">
+                    <Dropdown as={ButtonGroup}>
+                      <Mutation mutation={ADD_NOTE_CONTRIBUTOR_MUTATION}
+                        onCompleted={({addNoteContributor}) => {
+                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN: ', addNoteContributor.msg);
+                          this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                        }}>
+                        {(addNoteContributor, {data}) => (
+                          <Button variant="success" onClick={(e) => this.handleAddContributorButton(addNoteContributor, e)}>Añadir</Button>
+                        )}
+                      </Mutation>
+                      <Dropdown.Toggle split variant="success" id="dropdown-split-remove-note-contributor" />
+                      <Dropdown.Menu>
+                        <Mutation mutation={DELETE_NOTE_CONTRIBUTOR_MUTATION}
+                          onCompleted={({deleteNoteContributor}) => {
+                            console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN DE BORRADO: ', deleteNoteContributor.msg);
+                            this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                          }}>
+                          {(deleteNoteContributor, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleDeleteContributorButton(deleteNoteContributor, e)}>Eliminar</Dropdown.Item>
+                          )}
+                        </Mutation>
+                        <Mutation mutation={UPDATE_NOTE_ACCESS_MUTATION}
+                          onCompleted={({updateNoteAccess}) => {
+                            console.log('UPDATE NOTE ACCESS: ', updateNoteAccess.userId, updateNoteAccess.noteId, updateNoteAccess.canWrite);
+                            this.setState({addContributorTextfield: '', onlyReadRadioChecked: false, readWriteRadioChecked: true});
+                          }}>
+                          {(updateNoteAccess, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleUpdateNoteAccessButton(updateNoteAccess, e)}>Actualizar permisos</Dropdown.Item>
+                          )}
+                        </Mutation>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Col>
+                </Row>
+              </Container>
+            </Tab>
+          </Tabs>
         </Form>
       </Container>
     );

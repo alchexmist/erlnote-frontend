@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -42,9 +42,6 @@ function rootReducer(state = initialState, action) {
       return newStateUpdateNote;
     case UPDATE_NOTES:
       const updatedNotes = state.notes.filter((note) => {
-        // const newIDs = action.noteList.map((updatedNote) => updatedNote.id);
-        // const notFoundIDs = newIDs.findIndex((id) => id == note.id) == -1;
-        // return notFoundIDs;
         return action.noteList.map((updatedNote) => updatedNote.id).findIndex((id) => id == note.id) == -1;
       });
       return Object.assign(
@@ -54,6 +51,17 @@ function rootReducer(state = initialState, action) {
             notes: [...action.noteList, ...updatedNotes],
           }
       );
+      case DELETE_NOTES:
+        const noDeletedNotes = state.notes.filter((note) => {
+          return action.noteList.map((updatedNote) => updatedNote.id).findIndex((id) => id == note.id) !== -1;
+        });
+        return Object.assign(
+            {},
+            state,
+            {
+              notes: noDeletedNotes.slice(),
+            }
+        );
     case ADD_NEW_BOARD:
       return Object.assign(
           {},
@@ -134,6 +142,17 @@ function rootReducer(state = initialState, action) {
             boards: [...action.boardList, ...updatedBoards],
           }
       );
+      case DELETE_BOARDS:
+          const noDeletedBoards = state.boards.filter((board) => {
+            return action.boardList.map((updatedBoard) => updatedBoard.id).findIndex((id) => id == board.id) !== -1;
+          });
+          return Object.assign(
+              {},
+              state,
+              {
+                boards: noDeletedBoards.slice(),
+              }
+          );
     case UPDATE_TASKLIST:
       const newStateUpdateTasklist = Object.assign({}, state);
       const updateTasklistIndex = newStateUpdateTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.id);
@@ -148,6 +167,17 @@ function rootReducer(state = initialState, action) {
       //       tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
       //     }
       // );
+      case DELETE_TASKLISTS:
+          const noDeletedTasklists = state.tasklists.filter((tasklist) => {
+            return action.tasklistList.map((updatedTasklist) => updatedTasklist.id).findIndex((id) => id == tasklist.id) !== -1;
+          });
+          return Object.assign(
+              {},
+              state,
+              {
+                tasklists: noDeletedTasklists.slice(),
+              }
+          );
     case DELETE_TASKLIST:
       const newStateDeleteTasklist = Object.assign({}, state);
       const deleteTasklistIndex = newStateDeleteTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.tasklistID);

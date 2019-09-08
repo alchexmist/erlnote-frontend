@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
 
 
 export function logout() {
@@ -23,6 +23,10 @@ export function updateNotes(noteList) {
   return {type: UPDATE_NOTES, noteList: noteList};
 };
 
+export function deleteNotes(noteList) {
+  return {type: DELETE_NOTES, noteList: noteList};
+};
+
 export function updateBoard(boardDataObject) {
   return {type: UPDATE_BOARD, boardDataObject: boardDataObject};
 };
@@ -31,8 +35,16 @@ export function updateBoards(boardList) {
   return {type: UPDATE_BOARDS, boardList: boardList};
 };
 
+export function deleteBoards(boardList) {
+  return {type: DELETE_BOARDS, boardList: boardList};
+};
+
 export function updateTasklist(tasklistDataObject) {
   return {type: UPDATE_TASKLIST, tasklistDataObject: tasklistDataObject};
+};
+
+export function deleteTasklists(tasklistList) {
+  return {type: DELETE_TASKLISTS, tasklistList: tasklistList};
 };
 
 export function deleteTasklist(tasklistDataObject) {

@@ -68,6 +68,10 @@ class Boards extends Component {
               console.log('CONTRIBUTOR BOARDS STATE: ', this.props.boards);
               this.props.boardListRequest(me.contributorBoards);
             }
+            const allReceivedBoards = me.ownerBoards.concat(me.contributorBoards);
+            if (!(this.props.boards.every((e) => allReceivedBoards.includes(e)))) {
+              this.props.boardListDeleteRequest(allReceivedBoards);
+            }
           }}
         >
           {({loading, error, data}) => {

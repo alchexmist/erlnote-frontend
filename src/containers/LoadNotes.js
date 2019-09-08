@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import Notes from '../components/Notes';
-import {setUserAction, updateNotes} from '../redux/actions/index';
+import {setUserAction, updateNotes, deleteNotes} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -16,6 +16,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     noteListRequest: (noteList) => {
       dispatch(updateNotes(noteList));
+    },
+    noteListDeleteRequest: (noteList) => {
+      dispatch(deleteNotes(noteList));
     },
     setUserAction: (userAction) => {
       dispatch(setUserAction(userAction));

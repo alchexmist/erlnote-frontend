@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 import {connect} from 'react-redux';
 import Boards from '../components/Boards';
-import {setUserAction, updateBoards} from '../redux/actions/index';
+import {setUserAction, updateBoards, deleteBoards} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -15,6 +16,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     boardListRequest: (boardList) => {
       dispatch(updateBoards(boardList));
+    },
+    boardListDeleteRequest: (boardList) => {
+      dispatch(deleteBoards(boardList));
     },
     setUserAction: (userAction) => {
       dispatch(setUserAction(userAction));

@@ -106,6 +106,10 @@ class Tasklists extends Component {
             if (!(me.contributorTasklists.every((e) => this.props.tasklists.includes(e)))) {
               this.props.tasklistListRequest(me.contributorTasklists);
             }
+            const allReceivedTasklists = me.ownerTasklists.concat(me.contributorTasklists);
+            if (!(this.props.tasklists.every((e) => allReceivedTasklists.includes(e)))) {
+              this.props.tasklistListDeleteRequest(allReceivedTasklists);
+            }
           }}
         >
           {({loading, error, data}) => {

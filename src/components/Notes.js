@@ -78,6 +78,10 @@ class Notes extends Component {
             if (!(me.contributorNotes.every((e) => this.props.notes.includes(e)))) {
               this.props.noteListRequest(me.contributorNotes);
             }
+            const allReceivedNotes = me.ownerNotes.concat(me.contributorNotes);
+            if (!(this.props.notes.every((e) => allReceivedNotes.includes(e)))) {
+              this.props.noteListDeleteRequest(allReceivedNotes);
+            }
           }}
         >
           {({loading, error, data}) => {
