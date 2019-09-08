@@ -1,6 +1,7 @@
 export const LOGOUT = 'LOGOUT';
 export const ADD_ACCOUNT = 'ADD_ACCOUNT';
 export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
+export const UPDATE_NOTE='UPDATE_NOTE';
 export const UPDATE_NOTES = 'UPDATE_NOTES';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
 export const UPDATE_BOARDS = 'UPDATE_BOARDS';

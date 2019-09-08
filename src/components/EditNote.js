@@ -20,6 +20,20 @@ const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´O/g, 'Ó')
     .replace(/\´U/g, 'Ú');
 
+const UPDATE_NOTE_MUTATION = gql`
+  mutation UpdateNote($noteData: UpdateNoteInput!) {
+    note: updateNote(input: $noteData) {
+      id
+      title
+      body
+      tags {
+        id
+        name
+      }
+      updatedBy
+    }
+  }`;
+
 const GET_NOTE_ACCESS_INFO_QUERY = gql`
   query GetAccessInfo($entityId: ID!) {
     getAccessInfo(entityId: $entityId, entityType: NOTE) {
@@ -38,12 +52,12 @@ class EditNote extends Component {
     super(props);
 
     this.state = {
-    //   titleCursorOffset: 0,
-    //   newTaskName: '',
-    //   addTagTextfield: '',
-    //   addContributorTextfield: '',
-    //   readWriteRadioChecked: true,
-    //   onlyReadRadioChecked: false,
+      titleCursorOffset: 0,
+      //   newTaskName: '',
+      //   addTagTextfield: '',
+      //   addContributorTextfield: '',
+      //   readWriteRadioChecked: true,
+      //   onlyReadRadioChecked: false,
       userCanEdit: true,
     };
 
@@ -74,13 +88,31 @@ class EditNote extends Component {
     this.moreMutations = false;
   }
 
+  handleTitleChange(updateNote, e) {
+    const newTitle = (e.target.value.length > 0) ? fixAccentMark(e.target.value) : '<Sin título>';
+    const cursorStart = e.target.selectionStart;
+
+    this.setMoreMutations();
+
+    console.log('TITLE REF: ', this.noteTitleInput);
+    this.noteTitleInput.current.value = newTitle;
+    this.noteTitleInput.current.selectionStart = this.noteTitleInput.current.selectionEnd = cursorStart;
+    this.setState({titleCursorOffset: cursorStart});
+
+    updateNote({variables: {noteData: {
+      'id': this.props.noteID,
+      'title': newTitle,
+      'body': this.props.noteBody
+    }}});
+  }
+
   render() {
     //   {/* EL IDENTIFICADOR DE LA NOTA DE LA URL */}
     //   <Form.Label>{this.props.match.params.id}</Form.Label>
     return (
       <Container className="my-3">
         <Form>
-        <Query query={GET_NOTE_ACCESS_INFO_QUERY}
+          <Query query={GET_NOTE_ACCESS_INFO_QUERY}
             variables={{entityId: this.props.match.params.id}}
             fetchPolicy={'cache-and-network'}
             onCompleted={({getAccessInfo}) => {
@@ -95,12 +127,20 @@ class EditNote extends Component {
               return null;
             }}
           </Query>
-        <InputGroup>
+          <Mutation mutation={UPDATE_NOTE_MUTATION}
+            onCompleted={({note}) => {
+              this.props.updateNote({id: note.id, title: note.title, body: note.body, tags: note.tags, __typename: 'Note'});
+              this.unsetMoreMutations();
+            }}>
+            {(updateNote, {data}) => (
+              <InputGroup>
                 <InputGroup.Prepend>
                   <InputGroup.Text>Título</InputGroup.Text>
                 </InputGroup.Prepend>
-                <Form.Control ref={this.noteTitleInput} disabled={!this.state.userCanEdit} size="lg" type="text" placeholder="Título de la nota" defaultValue={(this.props.noteTitle !== null) ? this.props.noteTitle : 'No ha sido posible obtener el título'} />
+                <Form.Control ref={this.noteTitleInput} disabled={!this.state.userCanEdit} size="lg" type="text" placeholder="Título de la nota" defaultValue={(this.props.noteTitle !== null) ? this.props.noteTitle : 'No ha sido posible obtener el título'} onChange={(e) => this.handleTitleChange(updateNote, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}/>
               </InputGroup>
+            )}
+          </Mutation>
         </Form>
       </Container>
     );

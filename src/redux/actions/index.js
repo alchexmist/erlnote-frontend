@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, UPDATE_BOARD, UPDATE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
 
 
 export function logout() {
@@ -13,6 +13,10 @@ export function addAccount(payload) {
 
 export function deleteAccount() {
   return {type: DELETE_ACCOUNT};
+};
+
+export function updateNote(noteDataObject) {
+  return {type: UPDATE_NOTE, noteDataObject: noteDataObject};
 };
 
 export function updateNotes(noteList) {

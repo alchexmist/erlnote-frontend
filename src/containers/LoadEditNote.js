@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import {connect} from 'react-redux';
 import EditNote from '../components/EditNote';
-import {setUserAction} from '../redux/actions/index';
+import {setUserAction, updateNote} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -24,9 +24,9 @@ const mapDispatchToProps = (dispatch) => {
     setUserAction: (userAction) => {
       dispatch(setUserAction(userAction));
     },
-    // updateTasklist: (tasklistDataObject) => {
-    //   dispatch(updateTasklist(tasklistDataObject));
-    // },
+    updateNote: (noteDataObject) => {
+      dispatch(updateNote(noteDataObject));
+    },
     // deleteTasklist: (tasklistDataObject) => {
     //   dispatch(deleteTasklist(tasklistDataObject));
     // },
