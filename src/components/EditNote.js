@@ -89,12 +89,21 @@ const REMOVE_TAG_FROM_NOTE_MUTATION = gql`
     }
   }`;
 
+const DELETE_NOTE_MUTATION = gql`
+  mutation DeleteNoteUser($data: ID!) {
+    deleteNoteUser(noteId: $data) {
+      id
+      title
+    }
+  }`;
+
 class EditNote extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       titleCursorOffset: 0,
+      textAreaCursorOffset: 0,
       //   newTaskName: '',
       addTagTextfield: '',
       addContributorTextfield: '',
@@ -105,6 +114,7 @@ class EditNote extends Component {
 
     // Referencia (Ref) a entrada de título
     this.noteTitleInput = React.createRef();
+    this.textAreaInput = React.createRef();
     // this.newTaskTextField = React.createRef();
     this.addTagButton = React.createRef();
     this.noteContributorInput = React.createRef();
@@ -193,6 +203,29 @@ class EditNote extends Component {
       noteID: this.props.noteID,
       tagName: this.state.addTagTextfield,
     }});
+  }
+
+  handleDeleteNoteButton(deleteNoteUser, e) {
+    deleteNoteUser({variables: {data: this.props.noteID}});
+    this.props.deleteNote({noteID: this.props.noteID});
+    this.props.history.push('/dashboard');
+  }
+
+  handleTextAreaChange(updateNote, e) {
+    const newText = fixAccentMark(e.target.value);
+    const cursorStart = e.target.selectionStart;
+
+    this.setMoreMutations();
+
+    this.textAreaInput.current.value = newText;
+    this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = cursorStart;
+    this.setState({textAreaCursorOffset: cursorStart});
+
+    updateNote({variables: {noteData: {
+      'id': this.props.noteID,
+      'title': this.props.noteTitle,
+      'body': newText,
+    }}});
   }
 
   noteTag(t) {
@@ -351,7 +384,42 @@ class EditNote extends Component {
                 </Row>
               </Container>
             </Tab>
+            <Tab eventKey="tasklist-delete" title="Eliminar nota">
+              <Container className="mb-5">
+                <Row className="justify-content-center">
+                  <Col xs lg md sm xl="4">
+                    <Mutation mutation={DELETE_NOTE_MUTATION}
+                      onCompleted={({deleteNoteUser}) => {
+                        console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteNoteUser.id, deleteNoteUser.body);
+                      }}>
+                      {(deleteNoteUser, {data}) => (
+                        <Button variant='danger' onClick={(e) => this.handleDeleteNoteButton(deleteNoteUser, e)}>Eliminar lista de tareas</Button>
+                      )}
+                    </Mutation>
+                  </Col>
+                </Row>
+              </Container>
+            </Tab>
           </Tabs>
+
+          <Mutation mutation={UPDATE_NOTE_MUTATION}
+            onCompleted={({note}) => {
+              this.props.updateNote({id: note.id, title: note.title, body: note.body, tags: note.tags, __typename: 'Note'});
+              this.unsetMoreMutations();
+            }}>
+            {(updateNote, {data}) => (
+              <Form.Row>
+                <Form.Group as={Col} controlId="formGridNoteTextArea">
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="note-text-ig">Contenido</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <Form.Control ref={this.textAreaInput} as="textarea" rows="10" defaultValue={(this.props.noteBody !== null) ? this.props.noteBody : ''} onChange={(e) => this.handleTextAreaChange(updateNote, e)} onClick={(e) => this.setState({textAreaCursorOffset: e.target.selectionStart})} />
+                  </InputGroup>
+                </Form.Group>
+              </Form.Row>
+            )}
+          </Mutation>
 
           <Form.Row className="my-5" style={{'maxHeight': 100, 'overflowY': 'auto'}}>
             {this.props.noteTags.map((t) => this.noteTag(t))}

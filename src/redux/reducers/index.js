@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, ADD_TAG_NOTE, REMOVE_TAG_NOTE, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, ADD_TAG_NOTE, REMOVE_TAG_NOTE, UPDATE_NOTE, DELETE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -305,6 +305,13 @@ function rootReducer(state = initialState, action) {
         }
       }
       return newStateRemoveTagNote;
+      case DELETE_NOTE:
+          const newStateDeleteNote = Object.assign({}, state);
+          const deleteNoteIndex = newStateDeleteNote.notes.findIndex((t) => t.id == action.noteDataObject.noteID);
+          if (deleteNoteIndex !== -1) {
+            newStateDeleteNote.notes.splice(deleteNoteIndex, 1);
+          }
+          return newStateDeleteNote;
     default:
       return state;
   }

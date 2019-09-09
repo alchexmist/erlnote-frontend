@@ -2,6 +2,7 @@ export const LOGOUT = 'LOGOUT';
 export const ADD_ACCOUNT = 'ADD_ACCOUNT';
 export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
 export const UPDATE_NOTE='UPDATE_NOTE';
+export const DELETE_NOTE = 'DELETE_NOTE';
 export const UPDATE_NOTES = 'UPDATE_NOTES';
 export const DELETE_NOTES = 'DELETE_NOTES';
 export const ADD_TAG_NOTE = 'ADD_TAG_NOTE';
