@@ -74,6 +74,21 @@ const UPDATE_NOTE_ACCESS_MUTATION = gql`
     }
   }`;
 
+const LINK_TAG_TO_NOTE_MUTATION = gql`
+  mutation LinkTagToNote($noteID: ID!, $tagName: String!) {
+    tag: linkTagToNote(noteId: $noteID, tagName: $tagName) {
+      id
+      name
+    }
+  }`;
+
+const REMOVE_TAG_FROM_NOTE_MUTATION = gql`
+  mutation RemoveTagFromNote($noteID: ID!, $tagName: String!) {
+    removeTagFromNote(noteId: $noteID, tagName: $tagName) {
+      msg
+    }
+  }`;
+
 class EditNote extends Component {
   constructor(props) {
     super(props);
@@ -81,7 +96,7 @@ class EditNote extends Component {
     this.state = {
       titleCursorOffset: 0,
       //   newTaskName: '',
-      //   addTagTextfield: '',
+      addTagTextfield: '',
       addContributorTextfield: '',
       readWriteRadioChecked: true,
       onlyReadRadioChecked: false,
@@ -91,7 +106,7 @@ class EditNote extends Component {
     // Referencia (Ref) a entrada de título
     this.noteTitleInput = React.createRef();
     // this.newTaskTextField = React.createRef();
-    // this.addTagButton = React.createRef();
+    this.addTagButton = React.createRef();
     this.noteContributorInput = React.createRef();
 
     this.moreMutations = false;
@@ -161,6 +176,31 @@ class EditNote extends Component {
       'canWrite': this.state.readWriteRadioChecked,
     }}});
     this.noteContributorInput.current.focus();
+  }
+
+  handleAddTagButton(linkTagToNote, e) {
+    // this.addTagButton.current.value
+    linkTagToNote({variables: {
+      noteID: this.props.noteID,
+      tagName: this.state.addTagTextfield,
+    }});
+  }
+
+  handleRemoveTagButton(removeTagFromNote, e) {
+    // this.addTagButton.current.value
+    this.props.removeTagNote({noteID: this.props.noteID, name: this.state.addTagTextfield});
+    removeTagFromNote({variables: {
+      noteID: this.props.noteID,
+      tagName: this.state.addTagTextfield,
+    }});
+  }
+
+  noteTag(t) {
+    return (
+      <Badge key={t.id} className="mx-1" pill variant="dark">
+        {t.name}
+      </Badge>
+    );
   }
 
   render() {
@@ -275,7 +315,47 @@ class EditNote extends Component {
                 </Row>
               </Container>
             </Tab>
+            <Tab eventKey="tasklist-tags" disabled={!this.state.userCanEdit} title="Etiquetas">
+              <Container className="mb-5">
+                <Row className="justify-content-start">
+                  <Col xs lg md sm xl="4">
+                    <Form.Control ref={this.addTagButton} placeholder="Nombre de la etiqueta" value={this.state.addTagTextfield} onChange={(e) => this.setState({addTagTextfield: e.target.value})} />
+                  </Col>
+                  <Col xs lg md sm xl="2">
+                    <Dropdown as={ButtonGroup}>
+                      <Mutation mutation={LINK_TAG_TO_NOTE_MUTATION}
+                        onCompleted={({tag}) => {
+                          console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN: ', tag.id, tag.name);
+                          this.props.addTagNote({noteID: this.props.noteID, id: tag.id, name: tag.name});
+                          this.setState({addTagTextfield: ''});
+                        }}>
+                        {(linkTagToNote, {data}) => (
+                          <Button variant="success" onClick={(e) => this.handleAddTagButton(linkTagToNote, e)}>Añadir</Button>
+                        )}
+                      </Mutation>
+                      <Dropdown.Toggle split variant="success" id="dropdown-split-tags" />
+
+                      <Dropdown.Menu>
+                        <Mutation mutation={REMOVE_TAG_FROM_NOTE_MUTATION}
+                          onCompleted={({removeTagFromNote}) => {
+                            // console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', removeTagFromTasklist.msg);
+                            this.setState({addTagTextfield: ''});
+                          }}>
+                          {(removeTagFromNote, {data}) => (
+                            <Dropdown.Item onClick={(e) => this.handleRemoveTagButton(removeTagFromNote, e)}>Eliminar</Dropdown.Item>
+                          )}
+                        </Mutation>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Col>
+                </Row>
+              </Container>
+            </Tab>
           </Tabs>
+
+          <Form.Row className="my-5" style={{'maxHeight': 100, 'overflowY': 'auto'}}>
+            {this.props.noteTags.map((t) => this.noteTag(t))}
+          </Form.Row>
         </Form>
       </Container>
     );

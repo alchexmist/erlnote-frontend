@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, DELETE_ACCOUNT, ADD_TAG_NOTE, REMOVE_TAG_NOTE, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, ADD_NEW_BOARD, UPDATE_TASKLISTS, ADD_NEW_TASKLIST, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, UPDATE_TASKLIST, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK, ADD_NEW_NOTE} from '../constants/action-types';
 
 
 export function logout() {
@@ -25,6 +25,14 @@ export function updateNotes(noteList) {
 
 export function deleteNotes(noteList) {
   return {type: DELETE_NOTES, noteList: noteList};
+};
+
+export function addTagNote(tagDataObject) {
+  return {type: ADD_TAG_NOTE, tagDataObject: tagDataObject};
+};
+
+export function removeTagNote(tagDataObject) {
+  return {type: REMOVE_TAG_NOTE, tagDataObject: tagDataObject};
 };
 
 export function updateBoard(boardDataObject) {

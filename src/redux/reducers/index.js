@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {LOGOUT, ADD_ACCOUNT, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
+import {LOGOUT, ADD_ACCOUNT, ADD_TAG_NOTE, REMOVE_TAG_NOTE, UPDATE_NOTE, UPDATE_NOTES, DELETE_NOTES, DELETE_TASKLISTS, UPDATE_BOARD, UPDATE_BOARDS, DELETE_BOARDS, UPDATE_TASKLIST, UPDATE_TASKLISTS, UPDATE_ENTITY_VISIBLE, SET_USER_ACTION, ACTION_NONE, ADD_NEW_BOARD, ADD_NEW_TASKLIST, ADD_NEW_NOTE, ADD_NEW_TASK, UPDATE_TASK, ADD_TAG_TASKLIST, REMOVE_TAG_TASKLIST, DELETE_TASKLIST, DELETE_TASK} from '../constants/action-types';
 
 const initialState = {
   account: {
@@ -51,17 +51,17 @@ function rootReducer(state = initialState, action) {
             notes: [...action.noteList, ...updatedNotes],
           }
       );
-      case DELETE_NOTES:
-        const noDeletedNotes = state.notes.filter((note) => {
-          return action.noteList.map((updatedNote) => updatedNote.id).findIndex((id) => id == note.id) !== -1;
-        });
-        return Object.assign(
-            {},
-            state,
-            {
-              notes: noDeletedNotes.slice(),
-            }
-        );
+    case DELETE_NOTES:
+      const noDeletedNotes = state.notes.filter((note) => {
+        return action.noteList.map((updatedNote) => updatedNote.id).findIndex((id) => id == note.id) !== -1;
+      });
+      return Object.assign(
+          {},
+          state,
+          {
+            notes: noDeletedNotes.slice(),
+          }
+      );
     case ADD_NEW_BOARD:
       return Object.assign(
           {},
@@ -142,17 +142,17 @@ function rootReducer(state = initialState, action) {
             boards: [...action.boardList, ...updatedBoards],
           }
       );
-      case DELETE_BOARDS:
-          const noDeletedBoards = state.boards.filter((board) => {
-            return action.boardList.map((updatedBoard) => updatedBoard.id).findIndex((id) => id == board.id) !== -1;
-          });
-          return Object.assign(
-              {},
-              state,
-              {
-                boards: noDeletedBoards.slice(),
-              }
-          );
+    case DELETE_BOARDS:
+      const noDeletedBoards = state.boards.filter((board) => {
+        return action.boardList.map((updatedBoard) => updatedBoard.id).findIndex((id) => id == board.id) !== -1;
+      });
+      return Object.assign(
+          {},
+          state,
+          {
+            boards: noDeletedBoards.slice(),
+          }
+      );
     case UPDATE_TASKLIST:
       const newStateUpdateTasklist = Object.assign({}, state);
       const updateTasklistIndex = newStateUpdateTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.id);
@@ -167,17 +167,17 @@ function rootReducer(state = initialState, action) {
       //       tasklists: [...state.tasklists.filter((e) => action.tasklistDataObject.id !== e.id), action.tasklistDataObject],
       //     }
       // );
-      case DELETE_TASKLISTS:
-          const noDeletedTasklists = state.tasklists.filter((tasklist) => {
-            return action.tasklistList.map((updatedTasklist) => updatedTasklist.id).findIndex((id) => id == tasklist.id) !== -1;
-          });
-          return Object.assign(
-              {},
-              state,
-              {
-                tasklists: noDeletedTasklists.slice(),
-              }
-          );
+    case DELETE_TASKLISTS:
+      const noDeletedTasklists = state.tasklists.filter((tasklist) => {
+        return action.tasklistList.map((updatedTasklist) => updatedTasklist.id).findIndex((id) => id == tasklist.id) !== -1;
+      });
+      return Object.assign(
+          {},
+          state,
+          {
+            tasklists: noDeletedTasklists.slice(),
+          }
+      );
     case DELETE_TASKLIST:
       const newStateDeleteTasklist = Object.assign({}, state);
       const deleteTasklistIndex = newStateDeleteTasklist.tasklists.findIndex((t) => t.id == action.tasklistDataObject.tasklistID);
@@ -261,6 +261,50 @@ function rootReducer(state = initialState, action) {
             userActionEntityID: action.actionEntityID,
           }
       );
+    case ADD_TAG_NOTE:
+      const newStateAddTagNote = Object.assign({}, state);
+      const addTagNoteIndex = newStateAddTagNote.notes.findIndex((t) => t.id == action.tagDataObject.noteID);
+      if (addTagNoteIndex === -1) {
+        return newStateAddTagNote;
+      }
+      if (newStateAddTagNote.notes[addTagNoteIndex].tags && newStateAddTagNote.notes[addTagNoteIndex].tags.findIndex((t) => t.id == action.tagDataObject.id) === -1) {
+        newStateAddTagNote.notes[addTagNoteIndex].tags.push({id: action.tagDataObject.id, name: action.tagDataObject.name, __typename: 'Tag'});
+        // newStateAddTagTasklist.tasklists[addTagTasklistIndex].tags.sort(function(a, b) {
+        //   if (a.name > b.name) {
+        //     return 1;
+        //   }
+        //   if (a.name < b.name) {
+        //     return -1;
+        //   }
+        //   // a must be equal to b
+        //   return 0;
+        // });
+      }
+      return newStateAddTagNote;
+    case REMOVE_TAG_NOTE:
+      const newStateRemoveTagNote = Object.assign({}, state);
+      const removeTagNoteIndex = newStateRemoveTagNote.notes.findIndex((t) => t.id == action.tagDataObject.noteID);
+      if (removeTagNoteIndex === -1) {
+        return newStateRemoveTagNote;
+      }
+      if (newStateRemoveTagNote.notes[removeTagNoteIndex].tags) {
+        const removeTagNoteTargetIndex = newStateRemoveTagNote.notes[removeTagNoteIndex].tags.findIndex((t) => t.name == action.tagDataObject.name);
+        if (removeTagNoteTargetIndex !== -1) {
+          newStateRemoveTagNote.notes[removeTagNoteIndex].tags.splice(removeTagNoteTargetIndex, 1);
+          // newStateRemoveTagTasklist.tasklists[removeTagTasklistIndex].tags.sort(function(a, b) {
+          //   if (a.name > b.name) {
+          //     return 1;
+          //   }
+          //   if (a.name < b.name) {
+          //     return -1;
+          //   }
+          //   // a must be equal to b
+          //   return 0;
+          // });
+          return newStateRemoveTagNote;
+        }
+      }
+      return newStateRemoveTagNote;
     default:
       return state;
   }
