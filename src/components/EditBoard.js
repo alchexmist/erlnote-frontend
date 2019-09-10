@@ -40,6 +40,14 @@ subscription BoardUpdated($boardId: ID!) {
     updated_by
 }}`;
 
+const DELETE_BOARD_MUTATION = gql`
+  mutation DeleteBoardUser($data: ID!) {
+    deleteBoardUser(boardId: $data) {
+      id
+      title
+    }
+  }`;
+
 const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
     .replace(/\´e/g, 'é')
     .replace(/\´i/g, 'í')
@@ -144,6 +152,12 @@ class EditBoard extends Component {
     }}});
 
     this.setState({contributorUserName: ''});
+  }
+
+  handleDeleteBoardButton(deleteBoardUser, e) {
+    deleteBoardUser({variables: {data: this.props.boardID}});
+    this.props.deleteBoard({boardID: this.props.boardID});
+    this.props.history.push('/dashboard');
   }
 
   render() {
@@ -270,7 +284,18 @@ class EditBoard extends Component {
               </InputGroup>
             </Form.Group>
             <Form.Group as={Col} lg="4" md="4" sm="4" xl="4" xs="4" controlId="formGridBoardDelete">
-              <Button variant="danger">Eliminar pizarra</Button>
+            <Mutation mutation={DELETE_BOARD_MUTATION}
+                      onCompleted={({deleteBoardUser}) => {
+                        console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteBoardUser.id, deleteBoardUser.title);
+                      }}
+                      onError={(error) => {
+                        console.log('ERROR EN MUTACIÓN BORRADO: ', error);
+                      }
+                      }>
+                      {(deleteBoardUser, {data}) => (
+              <Button variant="danger" onClick={(e) => this.handleDeleteBoardButton(deleteBoardUser, e)}>Eliminar pizarra</Button>
+              )}
+                    </Mutation>
             </Form.Group>
           </Form.Row>
 

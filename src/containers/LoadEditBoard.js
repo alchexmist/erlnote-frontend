@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import {connect} from 'react-redux';
 import EditBoard from '../components/EditBoard';
-import {updateEntityVisible, setUserAction, updateBoard, addNewBoard} from '../redux/actions/index';
+import {updateEntityVisible, setUserAction, updateBoard, deleteBoard, addNewBoard} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -24,6 +24,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     updateBoard: (boardDataObject) => {
       dispatch(updateBoard(boardDataObject));
+    },
+    deleteBoard: (boardDataObject) => {
+      dispatch(deleteBoard(boardDataObject));
     },
   };
 };

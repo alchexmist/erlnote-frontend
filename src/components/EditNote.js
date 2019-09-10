@@ -97,6 +97,39 @@ const DELETE_NOTE_MUTATION = gql`
     }
   }`;
 
+const NOTE_UPDATED_SUBSCRIPTION = gql`
+  subscription NoteUpdated($noteId: ID!) {
+    noteUpdated(noteId: $noteId) {
+      id
+      title
+      body
+      tags {
+        id
+        name
+      }
+      updatedBy
+    }
+  }`;
+
+const NOTE_TAG_CREATED_SUBSCRIPTION = gql`
+  subscription NoteTagCreated($noteId: ID!) {
+    noteTagCreated(noteId: $noteId) {
+        id
+        name
+        noteId
+        updatedBy
+    }
+  }`;
+
+const NOTE_TAG_DELETED_SUBSCRIPTION = gql`
+  subscription NoteTagDeleted($noteId: ID!) {
+    noteTagDeleted(noteId: $noteId) {
+        msg
+        entityId
+        updatedBy
+    }
+  }`;
+
 class EditNote extends Component {
   constructor(props) {
     super(props);
@@ -242,6 +275,27 @@ class EditNote extends Component {
     return (
       <Container className="my-3">
         <Form>
+          <Subscription
+            subscription={NOTE_UPDATED_SUBSCRIPTION}
+            variables={{noteId: this.props.noteID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.noteUpdated;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.updateNote({id: data.id, title: data.title, body: data.body, tags: data.tags, __typename: 'Note'});
+                const currentTitleOffset = this.noteTitleInput.current.selectionStart;
+                this.noteTitleInput.current.value = data.title;
+                // this.noteTitleInput.current.selectionStart = this.noteTitleInput.current.selectionEnd = this.state.titleCursorOffset;
+                this.noteTitleInput.current.selectionStart = this.noteTitleInput.current.selectionEnd = currentTitleOffset;
+                const currentTextAreaOffset = this.textAreaInput.current.selectionStart;
+                this.textAreaInput.current.value = data.body;
+                // this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = currentTextAreaOffset;
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
           <Query query={GET_NOTE_ACCESS_INFO_QUERY}
             variables={{entityId: this.props.match.params.id}}
             fetchPolicy={'cache-and-network'}
@@ -424,6 +478,36 @@ class EditNote extends Component {
           <Form.Row className="my-5" style={{'maxHeight': 100, 'overflowY': 'auto'}}>
             {this.props.noteTags.map((t) => this.noteTag(t))}
           </Form.Row>
+
+          <Subscription
+            subscription={NOTE_TAG_CREATED_SUBSCRIPTION}
+            variables={{noteId: this.props.noteID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.noteTagCreated;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.addTagNote({noteID: this.props.noteID, id: data.id, name: data.name});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
+          <Subscription
+            subscription={NOTE_TAG_DELETED_SUBSCRIPTION}
+            variables={{noteId: this.props.noteID}}
+            onSubscriptionData={({subscriptionData}) => {
+              const data = subscriptionData.data.noteTagDeleted;
+              if (data.updatedBy !== this.props.currentUserID) {
+                console.log('SUSCRIPCIÓN ACEPTADA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+                this.props.removeTagNote({noteID: this.props.noteID, name: data.msg});
+                this.setState({state: this.state});
+              } else {
+                console.log('SUSCRIPCIÓN OMITIDA PARA USUARIO: ', data.updatedBy, this.props.currentUserID);
+              }
+            }}>
+          </Subscription>
+
         </Form>
       </Container>
     );

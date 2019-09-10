@@ -11,6 +11,7 @@ export const UPDATE_BOARD = 'UPDATE_BOARD';
 export const UPDATE_BOARDS = 'UPDATE_BOARDS';
 export const DELETE_BOARDS = 'DELETE_BOARDS';
 export const ADD_NEW_BOARD = 'ADD_NEW_BOARD';
+export const DELETE_BOARD = 'DELETE_BOARD';
 export const ADD_NEW_TASK = 'ADD_NEW_TASK';
 export const ADD_NEW_NOTE = 'ADD_NEW_NOTE';
 export const UPDATE_TASK = 'UPDATE_TASK';
