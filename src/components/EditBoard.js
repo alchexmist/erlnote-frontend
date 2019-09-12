@@ -2,11 +2,11 @@
 /* eslint-disable require-jsdoc */
 import React, {Component} from 'react';
 import Container from 'react-bootstrap/Container';
-import {Col, Button, ButtonGroup, Dropdown, Form, InputGroup} from 'react-bootstrap';
+import {Accordion, Badge, Card, Col, Button, ButtonGroup, Dropdown, Form, InputGroup} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
 import gql from 'graphql-tag';
-import {Mutation, Subscription} from 'react-apollo';
+import {Query, Mutation, Subscription} from 'react-apollo';
 
 const UPDATE_BOARD_MUTATION = gql`
   mutation UpdateBoard($boardData: UpdateBoardInput!) {
@@ -44,6 +44,14 @@ const DELETE_BOARD_MUTATION = gql`
     deleteBoardUser(boardId: $data) {
       id
       title
+    }
+  }`;
+
+const GET_BOARD_CONTRIBUTORS_QUERY = gql`
+  query GetBoardContributors($boardId: ID!) {
+    getBoardContributors(boardId: $boardId) {
+      usernames
+      boardId
     }
   }`;
 
@@ -210,7 +218,7 @@ class EditBoard extends Component {
                       onChange={(e) => this.handleTitleChange(updateBoard, e)}
                       onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}
                     /> */}
-                                        <Form.Control ref={this.titleInput}
+                    <Form.Control ref={this.titleInput}
                       type="text"
                       placeholder="Título de la pizarra"
                       defaultValue={(this.props.boardTitle) ? this.props.boardTitle : ''}
@@ -241,7 +249,7 @@ class EditBoard extends Component {
                       onChange={(e) => this.handleTextAreaChange(updateBoard, e)}
                       onClick={(e) => this.setState({textAreaCursorOffset: e.target.selectionStart})}
                     /> */}
-                                        <Form.Control ref={this.textAreaInput}
+                    <Form.Control ref={this.textAreaInput}
                       as="textarea"
                       rows="10"
                       defaultValue={(this.props.boardText) ? this.props.boardText : ''}
@@ -306,6 +314,36 @@ class EditBoard extends Component {
               </Mutation>
             </Form.Group>
           </Form.Row>
+
+          <Query query={GET_BOARD_CONTRIBUTORS_QUERY}
+            variables={{boardId: this.props.match.params.id}}
+            fetchPolicy={'cache-and-network'}
+            onCompleted={({getBoardContributors}) => {
+              console.log('QUERY RESULT: ', getBoardContributors.usernames);
+            }}
+          >
+            {({loading, error, data, refetch}) => {
+              if (loading) return null;
+              if (error) return null;
+
+              return (
+                <Accordion className="mb-3">
+                  <Card>
+                    <Card.Header>
+                      <Accordion.Toggle as={Button} variant="link" eventKey="0">
+        Ver colaboradores
+                      </Accordion.Toggle>
+                    </Card.Header>
+                    <Accordion.Collapse eventKey="0">
+                      <Card.Body>
+                        <Card.Text>{data.getBoardContributors.usernames.map((u, index) => {return (<Badge key={index} className="mr-1" pill='true' variant='dark'>{u}</Badge>);})}</Card.Text>
+                        <Button variant="success" onClick={() => refetch()}>Recargar</Button>
+                      </Card.Body>
+                    </Accordion.Collapse>
+                  </Card>
+                </Accordion>);
+            }}
+          </Query>
 
           <Button variant="primary" type="text" onClick={(e) => {
             e.preventDefault();
