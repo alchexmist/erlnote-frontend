@@ -5,7 +5,6 @@ import Container from 'react-bootstrap/Container';
 import {Col, Button, ButtonGroup, Dropdown, Form, InputGroup} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import {ACTION_NONE} from '../redux/constants/action-types';
-
 import gql from 'graphql-tag';
 import {Mutation, Subscription} from 'react-apollo';
 
@@ -48,16 +47,16 @@ const DELETE_BOARD_MUTATION = gql`
     }
   }`;
 
-const fixAccentMark = (string) => string.replace(/\´a/g, 'á')
-    .replace(/\´e/g, 'é')
-    .replace(/\´i/g, 'í')
-    .replace(/\´o/g, 'ó')
-    .replace(/\´u/g, 'ú')
-    .replace(/\´A/g, 'Á')
-    .replace(/\´E/g, 'É')
-    .replace(/\´I/g, 'Í')
-    .replace(/\´O/g, 'Ó')
-    .replace(/\´U/g, 'Ú');
+const fixAccentMark = (string) => string.replace(/´a/g, 'á')
+    .replace(/´e/g, 'é')
+    .replace(/´i/g, 'í')
+    .replace(/´o/g, 'ó')
+    .replace(/´u/g, 'ú')
+    .replace(/´A/g, 'Á')
+    .replace(/´E/g, 'É')
+    .replace(/´I/g, 'Í')
+    .replace(/´O/g, 'Ó')
+    .replace(/´U/g, 'Ú');
 
 class EditBoard extends Component {
   constructor(props) {
@@ -65,8 +64,8 @@ class EditBoard extends Component {
 
     this.state = {
       contributorUserName: '',
-      titleCursorOffset: 0,
-      textAreaCursorOffset: 0,
+      // titleCursorOffset: 0,
+      // textAreaCursorOffset: 0,
     };
 
     // Referencia (Ref) a entrada de título
@@ -104,7 +103,7 @@ class EditBoard extends Component {
 
     this.textAreaInput.current.value = newText;
     this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = cursorStart;
-    this.setState({textAreaCursorOffset: cursorStart});
+    // this.setState({textAreaCursorOffset: cursorStart});
 
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
@@ -121,7 +120,7 @@ class EditBoard extends Component {
 
     this.titleInput.current.value = newTitle;
     this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = cursorStart;
-    this.setState({titleCursorOffset: cursorStart});
+    // this.setState({titleCursorOffset: cursorStart});
 
     updateBoard({variables: {boardData: {
       'id': this.props.boardID,
@@ -166,43 +165,30 @@ class EditBoard extends Component {
     return (
       <Container className="my-3">
         <Form>
-          {/* <Subscription
-            subscription={BOARD_UPDATED_SUBSCRIPTION}
-            variables={{boardId: this.props.boardID}}
-            shouldResubscribe={true}
-            onSubscriptionData={({subscriptionData}) => {
-              const data = subscriptionData.data.boardUpdated;
-              console.log('Suscripción realizada con éxito: ', data);
-              this.props.updateBoard(data);
-              // this.titleInput.current.value = data.title;
-              // this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
-              this.textAreaInput.current.value = data.text;
-              this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
-            }}>
-          </Subscription> */}
-
           <Subscription
             subscription={BOARD_UPDATED_SUBSCRIPTION}
             variables={{boardId: this.props.boardID}}
             onSubscriptionData={({subscriptionData}) => {
               const data = subscriptionData.data.boardUpdated;
               if (data.updated_by !== this.props.currentUserID) {
+                const currentTitleCursorOffset = this.titleInput.current.selectionStart;
+                const currentTextAreaCursorOffset = this.textAreaInput.current.selectionStart;
                 this.props.updateBoard(data);
                 this.titleInput.current.value = data.title;
-                this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+                // this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = this.state.titleCursorOffset;
+                this.titleInput.current.selectionStart = this.titleInput.current.selectionEnd = currentTitleCursorOffset;
                 this.textAreaInput.current.value = data.text;
-                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+                // this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = this.state.textAreaCursorOffset;
+                this.textAreaInput.current.selectionStart = this.textAreaInput.current.selectionEnd = currentTextAreaCursorOffset;
               }
             }}>
           </Subscription>
           <Form.Row>
             <Form.Group as={Col} lg="2" md="2" sm="2" xl="2" xs="2" controlId="formGridBoardID">
-              {/* <Form.Label>Password</Form.Label> */}
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
                   <InputGroup.Text id="ig-id">ID</InputGroup.Text>
                 </InputGroup.Prepend>
-                {/* <Form.Control readOnly defaultValue={this.props.match.params.id} /> */}
                 <Form.Control readOnly defaultValue={this.props.boardID} />
               </InputGroup>
             </Form.Group>
@@ -217,8 +203,19 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-title">Título</InputGroup.Text>
                     </InputGroup.Prepend>
-                    {/* <Form.Control ref={this.titleInput} type="text" placeholder="Título de la pizarra" value={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} /> */}
-                    <Form.Control ref={this.titleInput} type="text" placeholder="Título de la pizarra" defaultValue={(this.props.boardTitle !== null) ? this.props.boardTitle : ''} onChange={(e) => this.handleTitleChange(updateBoard, e)} onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})} />
+                    {/* <Form.Control ref={this.titleInput}
+                      type="text"
+                      placeholder="Título de la pizarra"
+                      defaultValue={(this.props.boardTitle) ? this.props.boardTitle : ''}
+                      onChange={(e) => this.handleTitleChange(updateBoard, e)}
+                      onClick={(e) => this.setState({titleCursorOffset: e.target.selectionStart})}
+                    /> */}
+                                        <Form.Control ref={this.titleInput}
+                      type="text"
+                      placeholder="Título de la pizarra"
+                      defaultValue={(this.props.boardTitle) ? this.props.boardTitle : ''}
+                      onChange={(e) => this.handleTitleChange(updateBoard, e)}
+                    />
                   </InputGroup>
                 </Form.Group>
               )}
@@ -237,8 +234,19 @@ class EditBoard extends Component {
                     <InputGroup.Prepend>
                       <InputGroup.Text id="ig-text">Contenido</InputGroup.Text>
                     </InputGroup.Prepend>
-                    {/* <Form.Control as="textarea" rows="10" value={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} /> */}
-                    <Form.Control ref={this.textAreaInput} as="textarea" rows="10" defaultValue={(this.props.boardText !== null) ? this.props.boardText : ''} onChange={(e) => this.handleTextAreaChange(updateBoard, e)} onClick={(e) => this.setState({textAreaCursorOffset: e.target.selectionStart})} />
+                    {/* <Form.Control ref={this.textAreaInput}
+                      as="textarea"
+                      rows="10"
+                      defaultValue={(this.props.boardText) ? this.props.boardText : ''}
+                      onChange={(e) => this.handleTextAreaChange(updateBoard, e)}
+                      onClick={(e) => this.setState({textAreaCursorOffset: e.target.selectionStart})}
+                    /> */}
+                                        <Form.Control ref={this.textAreaInput}
+                      as="textarea"
+                      rows="10"
+                      defaultValue={(this.props.boardText) ? this.props.boardText : ''}
+                      onChange={(e) => this.handleTextAreaChange(updateBoard, e)}
+                    />
                   </InputGroup>
                 </Form.Group>
               </Form.Row>
@@ -284,18 +292,18 @@ class EditBoard extends Component {
               </InputGroup>
             </Form.Group>
             <Form.Group as={Col} lg="4" md="4" sm="4" xl="4" xs="4" controlId="formGridBoardDelete">
-            <Mutation mutation={DELETE_BOARD_MUTATION}
-                      onCompleted={({deleteBoardUser}) => {
-                        console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteBoardUser.id, deleteBoardUser.title);
-                      }}
-                      onError={(error) => {
-                        console.log('ERROR EN MUTACIÓN BORRADO: ', error);
-                      }
-                      }>
-                      {(deleteBoardUser, {data}) => (
-              <Button variant="danger" onClick={(e) => this.handleDeleteBoardButton(deleteBoardUser, e)}>Eliminar pizarra</Button>
-              )}
-                    </Mutation>
+              <Mutation mutation={DELETE_BOARD_MUTATION}
+                onCompleted={({deleteBoardUser}) => {
+                  console.log(`Eliminada pizarra ${deleteBoardUser.id}`);
+                }}
+                onError={(error) => {
+                  console.log('Error en mutación de borrado de la pizarra: ', error);
+                }
+                }>
+                {(deleteBoardUser, {data}) => (
+                  <Button variant="danger" onClick={(e) => this.handleDeleteBoardButton(deleteBoardUser, e)}>Eliminar pizarra</Button>
+                )}
+              </Mutation>
             </Form.Group>
           </Form.Row>
 
@@ -313,36 +321,3 @@ class EditBoard extends Component {
 
 export default withRouter(EditBoard);
 
-{/* <Form.Group controlId="formGridAddress1">
-<Form.Label>Address</Form.Label>
-<Form.Control placeholder="1234 Main St" />
-</Form.Group>
-
-<Form.Group controlId="formGridAddress2">
-<Form.Label>Address 2</Form.Label>
-<Form.Control placeholder="Apartment, studio, or floor" />
-</Form.Group>
-
-<Form.Row>
-<Form.Group as={Col} controlId="formGridCity">
-  <Form.Label>City</Form.Label>
-  <Form.Control />
-</Form.Group>
-
-<Form.Group as={Col} controlId="formGridState">
-  <Form.Label>State</Form.Label>
-  <Form.Control as="select">
-    <option>Choose...</option>
-    <option>...</option>
-  </Form.Control>
-</Form.Group>
-
-<Form.Group as={Col} controlId="formGridZip">
-  <Form.Label>Zip</Form.Label>
-  <Form.Control />
-</Form.Group>
-</Form.Row>
-
-<Form.Group id="formGridCheckbox">
-<Form.Check type="checkbox" label="Check me out" />
-</Form.Group> */}

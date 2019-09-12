@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import {connect} from 'react-redux';
 import EditBoard from '../components/EditBoard';
-import {updateEntityVisible, setUserAction, updateBoard, deleteBoard, addNewBoard} from '../redux/actions/index';
+import {setUserAction, updateBoard, deleteBoard} from '../redux/actions/index';
 import {withRouter} from 'react-router-dom';
 
 const mapStateToProps = (state) => {
@@ -9,9 +9,9 @@ const mapStateToProps = (state) => {
 
   return {
     currentUserID: state.account.userID,
-    boardID: (boardData != undefined && boardData != null) ? boardData.id : state.userActionEntityID,
-    boardTitle: (boardData != undefined && boardData != null) ? boardData.title : '',
-    boardText: (boardData != undefined && boardData != null) ? boardData.text : '',
+    boardID: (boardData !== undefined && boardData !== null) ? boardData.id : state.userActionEntityID,
+    boardTitle: (boardData !== undefined && boardData !== null) ? boardData.title : '',
+    boardText: (boardData !== undefined && boardData !== null) ? boardData.text : '',
     userAction: state.userAction,
     userActionEntityID: state.userActionEntityID,
   };
