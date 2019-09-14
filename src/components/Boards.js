@@ -49,7 +49,7 @@ class Boards extends Component {
 
   render() {
     if (this.props.userAction === ACTION_EDIT_BOARD) {
-      return <Redirect to={'/edit/board/' + this.props.userActionEntityID} />;
+      return <Redirect push to={'/edit/board/' + this.props.userActionEntityID} />;
     }
 
     return (

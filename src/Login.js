@@ -59,7 +59,7 @@ export default class Login extends Component {
     const {redirectToDashboard} = this.state;
 
     if (redirectToDashboard === true) {
-      return <Redirect to='/dashboard' />;
+      return <Redirect push to='/dashboard' />;
     }
 
     // const style = {loginLabel: {'color': 'while', 'backgroundColor': 'rgb(53, 58, 63)'}};

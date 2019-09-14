@@ -71,13 +71,13 @@ export default class MainBar extends Component {
 
   render() {
     if (this.props.userAction === ACTION_CREATE_BOARD) {
-      return <Redirect to={'/edit/board/' + this.props.userActionEntityID} />;
+      return <Redirect push to={'/edit/board/' + this.props.userActionEntityID} />;
     }
     if (this.props.userAction === ACTION_CREATE_TASKLIST) {
-      return <Redirect to={'/edit/tasklist/' + this.props.userActionEntityID} />;
+      return <Redirect push to={'/edit/tasklist/' + this.props.userActionEntityID} />;
     }
     if (this.props.userAction === ACTION_CREATE_NOTE) {
-      return <Redirect to={'/edit/note/' + this.props.userActionEntityID} />;
+      return <Redirect push to={'/edit/note/' + this.props.userActionEntityID} />;
     }
 
     return (

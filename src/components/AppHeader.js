@@ -36,7 +36,7 @@ class AppHeader extends Component {
 
   render() {
     // if (!this.isAuth()) {
-    //   return <Redirect to={'/'} />;
+    //   return <Redirect push to={'/'} />;
     // }
 
     return (

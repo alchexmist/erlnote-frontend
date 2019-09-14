@@ -59,7 +59,7 @@ function App() {
         {/* <Route path="/dashboard" exact component={MainContainer} /> */}
         {/* <Route path="/edit/board/:id" exact component={LoadEditBoard} /> */}
         {/* <Route path="/protected" exact render={(props) => <Protected {...props} extra={'Protegido'} />} /> */}
-        <Route exact path="/" render={() => (existToken() ? (<Redirect to="/dashboard"/>) : (<RunLogin />))}/>
+        <Route exact path="/" render={() => (existToken() ? (<Redirect push to="/dashboard"/>) : (<RunLogin />))}/>
         <Route exact path="/dashboard" render={() => (existToken() ? (<LoadMainContainer />) : (<RunLogin />))}/>
         <Route exact path="/edit/board/:id" render={() => (existToken() ? (<LoadEditBoard />) : (<RunLogin />))}/>
         <Route exact path="/edit/tasklist/:id" render={() => (existToken() ? (<LoadEditTasklist />) : (<RunLogin />))}/>

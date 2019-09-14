@@ -114,7 +114,7 @@ class Tasklists extends Component {
 
   render() {
     if (this.props.userAction === ACTION_EDIT_TASKLIST) {
-      return <Redirect to={'/edit/tasklist/' + this.props.userActionEntityID} />;
+      return <Redirect push to={'/edit/tasklist/' + this.props.userActionEntityID} />;
     }
 
     return (
