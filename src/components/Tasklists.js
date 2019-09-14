@@ -7,6 +7,11 @@ import {Query} from 'react-apollo';
 import {ACTION_EDIT_TASKLIST} from '../redux/constants/action-types';
 import {Redirect} from 'react-router-dom';
 
+const TASK_STATE_FINISHED = 'FINISHED';
+const TASK_PRIORITY_LOW = 'LOW';
+const TASK_PRIORITY_NORMAL = 'NORMAL';
+const TASK_PRIORITY_HIGH = 'HIGH';
+
 const GET_TASKLISTS = gql`
   {
       me {
@@ -62,8 +67,26 @@ class Tasklists extends Component {
   }
 
   parseTaskData(taskData) {
+    const style = {};
+    if (taskData.state === TASK_STATE_FINISHED) {
+      style['textDecoration'] = 'line-through';
+    } else {
+      style['textDecoration'] = 'initial';
+    }
+
+    switch (taskData.priority) {
+      case TASK_PRIORITY_HIGH:
+        style['color'] = 'red';
+        break;
+      case TASK_PRIORITY_LOW:
+        style['color'] = 'green';
+        break;
+      default:
+        break;
+    }
+
     return (
-      <ListGroup.Item key={taskData.id}>{taskData.name}</ListGroup.Item>
+      <ListGroup.Item key={taskData.id} style={style}>{taskData.name}</ListGroup.Item>
     );
   }
 
