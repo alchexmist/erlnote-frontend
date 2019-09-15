@@ -447,7 +447,7 @@ class EditNote extends Component {
                         console.log('ESTADO DE LA ETIQUETA RESULTADO DE MUTACIÓN BORRADO: ', deleteNoteUser.id, deleteNoteUser.body);
                       }}>
                       {(deleteNoteUser, {data}) => (
-                        <Button variant='danger' onClick={(e) => this.handleDeleteNoteButton(deleteNoteUser, e)}>Eliminar lista de tareas</Button>
+                        <Button variant='danger' onClick={(e) => this.handleDeleteNoteButton(deleteNoteUser, e)}>Eliminar nota</Button>
                       )}
                     </Mutation>
                   </Col>
