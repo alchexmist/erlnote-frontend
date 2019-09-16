@@ -82,7 +82,7 @@ export default class MainBar extends Component {
 
     return (
       <Container className="p-0" fluid="true">
-        <Navbar variant="dark" bg="dark" expand="xl" >
+        <Navbar variant="dark" bg="dark" expand="md" >
 
           {this.props.entityVisible === ENTITY_VISIBLE_ID_NOTES && <Navbar.Brand>Notas</Navbar.Brand>}
           {this.props.entityVisible === ENTITY_VISIBLE_ID_BOARDS && <Navbar.Brand>Pizarras</Navbar.Brand>}
